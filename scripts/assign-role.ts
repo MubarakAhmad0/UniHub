@@ -5,9 +5,6 @@
  * Available role keys: admin, manager, user
  */
 
-import { config } from "dotenv";
-config({ path: ".env" });
-
 import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { users } from "../db/schema";
@@ -17,7 +14,9 @@ const [email, roleKey] = process.argv.slice(2);
 
 if (!email || !roleKey) {
   console.error("Usage: npx tsx scripts/assign-role.ts <email> <role-key>");
-  console.error("Example: npx tsx scripts/assign-role.ts john@example.com admin");
+  console.error(
+    "Example: npx tsx scripts/assign-role.ts john@example.com admin",
+  );
   process.exit(1);
 }
 

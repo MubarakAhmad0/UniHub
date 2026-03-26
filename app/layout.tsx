@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Boilerplate App",
-  description: "A generic boilerplate application",
+  title: "UniHub",
+  description: "The UniHub application",
 };
 
 export default async function RootLayout({

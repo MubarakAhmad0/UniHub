@@ -41,7 +41,7 @@ export const auth = betterAuth({
       await sendEmail({
         subject: "Reset Password",
         to: user.email,
-        from: "no-reply@myapp.com",
+        from: "no-reply@gmail.com",
         text: url,
       });
     },
@@ -73,21 +73,21 @@ export const auth = betterAuth({
             await sendEmail({
               to: email,
               subject: "Reset Password Request",
-              from: "no-reply@myapp.com",
+              from: "no-reply@gmail.com",
               text: otp,
             });
           case "email-verification":
             await sendEmail({
               to: email,
               subject: "Account Verification",
-              from: "no-reply@myapp.com",
+              from: "no-reply@gmail.com",
               text: otp,
             });
           case "sign-in":
             await sendEmail({
               to: email,
               subject: "Sign In OTP",
-              from: "no-reply@myapp.com",
+              from: "no-reply@gmail.com",
               text: otp,
             });
             break;

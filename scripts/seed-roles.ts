@@ -3,9 +3,6 @@
  * Run with: npx tsx scripts/seed-roles.ts
  */
 
-import { config } from "dotenv";
-config({ path: ".env" });
-
 import { db } from "../db";
 import { roles } from "../db/schema/auth";
 
