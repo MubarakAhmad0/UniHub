@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(npx tsc:*)",
+      "Bash(pnpm lint:*)",
+      "Bash(pnpm build:*)",
+      "Bash(pnpm dev:*)",
+      "Bash(npx tsgo:*)",
+      "Bash(grep:*)",
+      "Bash(pnpm list:*)",
+      "Bash(pnpm add:*)",
+      "Bash(bun run:*)",
+      "Bash(awk:*)",
+      "Bash(cat:*)",
+      "Bash(psql:*)",
+      "Bash(pnpm drizzle-kit:*)",
+      "mcp__ide__getDiagnostics",
+      "Read(//c/Users/Mirza Work/Pictures/Screenshots/**)",
+      "Bash(find:*)",
+      "Bash(pnpm tsc:*)",
+      "Bash(git commit:*)",
+      "Bash(git checkout:*)",
+      "Bash(git push:*)",
+      "Bash(gh pr create:*)"
+    ],
+    "deny": [
+      "Bash(npx drizzle:*)"
+    ]
+  }
+}

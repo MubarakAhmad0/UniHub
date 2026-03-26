@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: boilerplate
+  namespace: default
+  labels:
+    app: boilerplate
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: boilerplate
+  template:
+    metadata:
+      labels:
+        app: boilerplate
+    spec:
+      containers:
+        - name: boilerplate
+          image: your-registry/boilerplate:latest  # Replace with your image
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NEXT_PUBLIC_ENVIRONMENT
+              value: "dev"
+            - name: APP_ENV
+              value: "staging"
+            - name: DB_URL
+              value: "postgresql://postgres:password@localhost:5432/boilerplate"  # Replace with your DB URL
+            - name: AUTH_TRUST_HOST
+              value: "true"
+            - name: AUTH_URL
+              value: "https://your-app.example.com/api/auth"  # Replace with your app URL
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secrets
+                  key: aws-access-key-id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secrets
+                  key: aws-secret-access-key
+            - name: AUTH_GOOGLE_ID
+              valueFrom:
+                secretKeyRef:
+                  name: auth-secrets
+                  key: google-auth-id
+            - name: AUTH_GOOGLE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: auth-secrets
+                  key: google-auth-secret
+            - name: AUTH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: auth-secrets
+                  key: auth-secret
+      imagePullSecrets:
+        - name: registry-credentials

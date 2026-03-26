@@ -1,0 +1,69 @@
+import React from "react";
+import { CardTitle } from "@/components/ui/card";
+import { Clock, Calendar, UserCircle } from "lucide-react";
+import { toTitleCase } from "@/lib/utils";
+
+const DashboardHeader = ({ user }: any) => {
+  const getGreeting = () => {
+    const hour = new Date().toLocaleString("en-US", {
+      timeZone: "Asia/Kuala_Lumpur",
+      hour: "numeric",
+      hour12: false,
+    });
+    const hourInt = parseInt(hour, 10);
+    if (hourInt < 12) return "Good morning";
+    if (hourInt < 17) return "Good afternoon";
+    return "Good evening";
+  };
+
+  const getDateDisplay = () => {
+    return new Date().toLocaleDateString("en-US", {
+      timeZone: "Asia/Kuala_Lumpur",
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  const getTimeDisplay = () => {
+    return new Date().toLocaleTimeString("en-US", {
+      timeZone: "Asia/Kuala_Lumpur",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
+  };
+
+  return (
+    <div className="container mx-auto p-6">
+      <div className="pb-2">
+        <div className="flex flex-col md:flex-row items-center justify-between">
+          <div className="text-center md:text-left">
+            <CardTitle className="text-2xl font-bold">
+              {getGreeting()}, {toTitleCase(user?.name) || "Welcome"}
+            </CardTitle>
+            <div className="flex flex-col md:flex-row items-center mt-2 text-sm text-muted-foreground">
+              <div className="flex items-center mb-1 md:mb-0">
+                <Clock className="w-4 h-4 mr-2" />
+                <span>{getTimeDisplay()}</span>
+              </div>
+              <div className="flex items-center mb-1 md:mb-0 md:ml-4">
+                <Calendar className="w-4 h-4 mr-2" />
+                <span>{getDateDisplay()}</span>
+              </div>
+              {user?.department && (
+                <div className="flex items-center md:ml-4">
+                  <UserCircle className="w-4 h-4 mr-2" />
+                  <span>{user.department}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default DashboardHeader;

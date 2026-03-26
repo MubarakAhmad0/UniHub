@@ -1,0 +1,22 @@
+rmdir /s /q "c:\Users\ASUS\Documents\GitHub\Boilerplate\app\(driver-app)"
+rmdir /s /q "c:\Users\ASUS\Documents\GitHub\Boilerplate\app\(mobile)"
+rmdir /s /q "c:\Users\ASUS\Documents\GitHub\Boilerplate\app\bye"
+rmdir /s /q "c:\Users\ASUS\Documents\GitHub\Boilerplate\app\florist"
+rmdir /s /q "c:\Users\ASUS\Documents\GitHub\Boilerplate\app\production-curation-kanban"
+rmdir /s /q "c:\Users\ASUS\Documents\GitHub\Boilerplate\app\print"
+rmdir /s /q "c:\Users\ASUS\Documents\GitHub\Boilerplate\app\tv"
+
+rmdir /s /q "c:\Users\ASUS\Documents\GitHub\Boilerplate\app\dashboard\brand"
+rmdir /s /q "c:\Users\ASUS\Documents\GitHub\Boilerplate\app\dashboard\ceo-office"
+rmdir /s /q "c:\Users\ASUS\Documents\GitHub\Boilerplate\app\dashboard\cs"
+rmdir /s /q "c:\Users\ASUS\Documents\GitHub\Boilerplate\app\dashboard\hr"
+rmdir /s /q "c:\Users\ASUS\Documents\GitHub\Boilerplate\app\dashboard\logistic"
+rmdir /s /q "c:\Users\ASUS\Documents\GitHub\Boilerplate\app\dashboard\marketing"
+rmdir /s /q "c:\Users\ASUS\Documents\GitHub\Boilerplate\app\dashboard\production"
+rmdir /s /q "c:\Users\ASUS\Documents\GitHub\Boilerplate\app\dashboard\products"
+rmdir /s /q "c:\Users\ASUS\Documents\GitHub\Boilerplate\app\dashboard\retail"
+rmdir /s /q "c:\Users\ASUS\Documents\GitHub\Boilerplate\app\dashboard\sales"
+rmdir /s /q "c:\Users\ASUS\Documents\GitHub\Boilerplate\app\dashboard\scm"
+rmdir /s /q "c:\Users\ASUS\Documents\GitHub\Boilerplate\app\dashboard\tech"
+
+echo "Done" > result.txt

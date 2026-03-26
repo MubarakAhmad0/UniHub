@@ -1,0 +1,22 @@
+# Ignore artifacts:
+build
+coverage
+
+# Ignore non-JS/TS files
+*.css
+*.scss
+*.json
+*.md
+*.yaml
+*.yml
+*.html
+*.svg
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.txt
+*.pdf
+*.env*
+*.lock
