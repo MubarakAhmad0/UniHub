@@ -20,6 +20,9 @@ import { FileKey2, IdCard, Shield, UserIcon, UsersIcon } from "lucide-react";
 import Link from "next/link";
 import { NavAcademic } from "./navigation/nav-academic";
 import { NavAdmin } from "./navigation/nav-admin";
+import { NavCampus } from "./navigation/nav-campus";
+import { NavCommunity } from "./navigation/nav-community";
+import { NavServices } from "./navigation/nav-services";
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   user: {
@@ -42,6 +45,9 @@ export function AppSidebar({
       </SidebarHeader>
       <SidebarContent>
         <NavAcademic />
+        <NavCampus />
+        <NavCommunity />
+        <NavServices />
         {accessibleSections.includes("admin") && <NavAdmin />}
       </SidebarContent>
       <SidebarFooter>
