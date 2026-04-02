@@ -16,9 +16,9 @@ import {
 } from "@/components/ui/sidebar";
 import type { SidebarSection } from "@/lib/auth/sidebar-permissions";
 
-
 import { FileKey2, IdCard, Shield, UserIcon, UsersIcon } from "lucide-react";
 import Link from "next/link";
+import { NavAcademic } from "./navigation/nav-academic";
 import { NavAdmin } from "./navigation/nav-admin";
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
@@ -41,6 +41,7 @@ export function AppSidebar({
         <CompanyHeader />
       </SidebarHeader>
       <SidebarContent>
+        <NavAcademic />
         {accessibleSections.includes("admin") && <NavAdmin />}
       </SidebarContent>
       <SidebarFooter>
