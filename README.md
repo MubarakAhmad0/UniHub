@@ -1,39 +1,43 @@
-# Boilerplate
+# UniHub
 
-A Next.js 15 full-stack boilerplate with authentication, role-based access control, and a ready-to-use admin dashboard.
-
-## Stack
-
-- **Framework**: Next.js 15 (App Router, Turbopack)
-- **Auth**: better-auth (email/password, Google OAuth, OTP)
-- **Database**: PostgreSQL + Drizzle ORM
-- **UI**: shadcn/ui, Tailwind CSS, Radix UI
-- **Data fetching**: TanStack Query + oRPC
-- **Forms**: React Hook Form + Zod
+A university student portal built with Next.js 15. Provides four domains — **Academic**, **Campus**, **Community**, and **Services** — plus an **Admin module** for user, role, and permission management.
 
 ---
 
-## Quick Start (New Project)
+## Stack
 
-Run the interactive setup script — it handles everything in one go:
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 15 (App Router, Turbopack) |
+| Auth | better-auth (email/password, Google OAuth, OTP, phone) |
+| Database | PostgreSQL + Drizzle ORM |
+| API | oRPC + TanStack Query |
+| UI | shadcn/ui, Radix UI, Tailwind CSS, Framer Motion |
+| Forms | React Hook Form + Zod |
+| Package manager | pnpm |
+
+---
+
+## Quick Start
+
+Run the interactive setup script — it handles everything at once:
 
 ```bash
 pnpm setup
 ```
 
-It will prompt you for:
+It will ask for:
 - App name
 - Database URL
 - Admin name, email, and password
 
 Then it automatically:
 1. Writes your `.env`
-2. Updates placeholders (`layout.tsx` title, `package.json` name, email sender)
-3. Pushes the database schema (`drizzle-kit push`)
-4. Seeds default roles (admin, manager, user)
-5. Creates the admin user and assigns the admin role
+2. Pushes the database schema (`drizzle-kit push`)
+3. Seeds default roles (`admin`, `lecturer`, `student`)
+4. Creates the admin user and assigns the admin role
 
-After setup:
+Then start the dev server:
 
 ```bash
 pnpm dev
@@ -45,23 +49,23 @@ Open [http://localhost:3000](http://localhost:3000) and log in with your admin c
 
 ## Manual Setup
 
-If you prefer to set things up step by step:
-
 ### 1. Configure environment
 
-Copy and fill in `.env`:
+Copy `.env.example` and fill in:
 
 ```env
-DB_URL=postgresql://postgres:password@localhost:5432/your_db
+DB_URL=postgresql://postgres:password@localhost:5432/unihub
 AUTH_SECRET=your-random-secret
 AUTH_URL=http://localhost:3000/api/auth
 AUTH_TRUST_HOST=true
+AUTH_GOOGLE_ID=your-google-client-id
+AUTH_GOOGLE_SECRET=your-google-client-secret
 ```
 
-### 2. Set up PostgreSQL (Docker)
+### 2. Run PostgreSQL (Docker)
 
 ```bash
-docker run --name my-app-db -e POSTGRES_PASSWORD=password -p 5432:5432 -d postgres
+docker run --name unihub-db -e POSTGRES_PASSWORD=password -p 5432:5432 -d postgres
 ```
 
 ### 3. Push database schema
@@ -78,7 +82,7 @@ pnpm exec tsx scripts/seed-roles.ts
 
 ### 5. Assign admin role to a user
 
-After registering a user through the app:
+After registering through the app:
 
 ```bash
 pnpm exec tsx scripts/assign-role.ts your@email.com admin
@@ -86,18 +90,36 @@ pnpm exec tsx scripts/assign-role.ts your@email.com admin
 
 ---
 
-## Database
+## Project Structure
 
-### View/edit data with Drizzle Studio
-
-```bash
-pnpm drizzle-kit studio
 ```
-
-### Regenerate schema after changes
-
-```bash
-pnpm drizzle-kit push
+app/
+  (admin-module)/admin/     # Admin: users, roles, permissions
+  dashboard/
+    academic/               # Courses, marks, attendance, announcements, study plan
+    campus/                 # Events, forums, library, map, venues, timetable
+    community/              # Clubs, marketplace
+    services/               # Complaints, documents, finances
+  api/
+    auth/                   # better-auth handlers
+    rpc/                    # oRPC router endpoint
+components/
+  ui/                       # shadcn/ui primitives (do not edit)
+  navigation/               # Sidebar nav sections
+  data-table/               # Generic DataTable system
+db/
+  schema/
+    auth/                   # better-auth tables (do not modify)
+    core/                   # Application tables (users, branches, departments)
+    enums.ts                # All pgEnum definitions
+lib/
+  auth.ts                   # better-auth config
+  auth/                     # Session, permissions, email utilities
+  orpc/                     # oRPC client & server config
+scripts/
+  setup.ts                  # First-run interactive setup
+  seed-roles.ts             # Seed default roles
+  assign-role.ts            # Assign a role to a user by email
 ```
 
 ---
@@ -107,42 +129,40 @@ pnpm drizzle-kit push
 | Role | Key | Access |
 |---|---|---|
 | Administrator | `admin` | Full access — bypasses all permission checks |
-| Manager | `manager` | Can manage users and view reports |
-| User | `user` | Standard access |
+| Lecturer | `lecturer` | Can manage course content, post announcements |
+| Student | `student` | Standard read + personal data access |
 
-Roles are managed via the **Admin → Manage Roles** page in the dashboard. Permissions can be assigned to roles via **Admin → Manage Permissions**.
+Roles are managed in **Admin → Manage Roles**. Permissions (`resource:action`) are assigned to roles in **Admin → Manage Permissions**.
 
 ---
 
-## Scaffolding a DataTable
+## Database
 
-Use the built-in plop generator to scaffold a new data table module:
+```bash
+pnpm drizzle-kit push    # Push schema changes to DB
+pnpm drizzle-kit studio  # Open Drizzle Studio GUI
+pnpm db:erd              # Regenerate erd.svg ERD diagram
+```
+
+---
+
+## Scaffold a DataTable Module
 
 ```bash
 pnpm artisan:plop
 ```
 
-1. Enter the module name (lowercase, singular — e.g. `product`, `invoice`)
-2. Enter a route prefix (e.g. `dashboard`) — files are generated under `/app/{prefix}/{module}/`
-3. Edit the generated files under `_lib/` (queries, actions, validations), then `_components/`
+1. Enter the module name (lowercase, singular — e.g. `course`)
+2. Enter a route prefix (e.g. `dashboard/academic`)
+3. Edit the generated `_lib/` files (queries, actions, validations) and `_components/`
 
 ---
 
-## Project Structure
+## AI Agent Context
 
-```
-app/
-  (admin-module)/admin/   # Admin pages: users, roles, permissions
-  dashboard/              # Main app dashboard
-  api/auth/               # better-auth handlers
-components/               # Shared UI components
-db/
-  schema/                 # Drizzle schema (auth + core)
-lib/
-  auth/                   # Session, permissions, role utils
-  auth.ts                 # better-auth config
-scripts/
-  setup.ts                # Quick-start setup script
-  seed-roles.ts           # Role seeder
-  assign-role.ts          # Assign a role to a user by email
-```
+See `CLAUDE.md` at the root for project-wide AI rules.
+Domain-specific context is in:
+- `app/CLAUDE.md` — routing conventions
+- `db/CLAUDE.md` — schema and database rules
+- `lib/CLAUDE.md` — permission system, oRPC patterns
+- `components/CLAUDE.md` — UI component rules

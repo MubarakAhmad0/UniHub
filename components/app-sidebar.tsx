@@ -22,6 +22,7 @@ import { NavAcademic } from "./navigation/nav-academic";
 import { NavAdmin } from "./navigation/nav-admin";
 import { NavCampus } from "./navigation/nav-campus";
 import { NavCommunity } from "./navigation/nav-community";
+import { NavGeneral } from "./navigation/nav-general";
 import { NavServices } from "./navigation/nav-services";
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
@@ -44,6 +45,7 @@ export function AppSidebar({
         <CompanyHeader />
       </SidebarHeader>
       <SidebarContent>
+        <NavGeneral />
         <NavAcademic />
         <NavCampus />
         <NavCommunity />

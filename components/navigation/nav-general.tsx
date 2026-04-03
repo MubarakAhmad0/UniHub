@@ -16,66 +16,38 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { useNavOpenItems } from "@/hooks/use-nav-open-items";
-import {
-  BarChart2,
-  BookOpen,
-  CalendarDays,
-  ChevronRight,
-  ClipboardCheck,
-  GraduationCap,
-  School,
-} from "lucide-react";
+import { ChevronRight, LayoutDashboard, Megaphone } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const navAcademicItems = [
+const navGeneralItems = [
   {
-    title: "Academic",
+    title: "General",
     url: "#",
-    icon: School,
+    icon: LayoutDashboard,
     isActive: true,
     items: [
       {
-        title: "Course Catalog",
-        href: "/dashboard/academic/courses",
-        icon: BookOpen,
-      },
-      {
-        title: "My Courses",
-        href: "/dashboard/academic/my-courses",
-        icon: GraduationCap,
-      },
-      {
-        title: "Study Plan",
-        href: "/dashboard/academic/study-plan",
-        icon: CalendarDays,
-      },
-      {
-        title: "Marks & GPA",
-        href: "/dashboard/academic/marks",
-        icon: BarChart2,
-      },
-      {
-        title: "Attendance",
-        href: "/dashboard/academic/attendance",
-        icon: ClipboardCheck,
+        title: "Announcements",
+        href: "/dashboard/announcements",
+        icon: Megaphone,
       },
     ],
   },
 ];
 
-export function NavAcademic() {
+export function NavGeneral() {
   const pathname = usePathname();
   const { isItemOpen, handleOpenChange } = useNavOpenItems(
-    "academic",
-    navAcademicItems,
+    "general",
+    navGeneralItems,
   );
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Academic</SidebarGroupLabel>
+      <SidebarGroupLabel>General</SidebarGroupLabel>
       <SidebarMenu>
-        {navAcademicItems.map((section) => (
+        {navGeneralItems.map((section) => (
           <Collapsible
             key={section.title}
             asChild
