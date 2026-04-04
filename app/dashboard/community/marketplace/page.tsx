@@ -41,8 +41,13 @@ import {
   Search,
   Shirt,
   SmartphoneIcon,
+  ShieldAlert,
+  Trash2,
+  AlertTriangle,
 } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/lib/auth/use-auth";
+import { MarketplaceModerationPanel } from "./_components/marketplace-moderation-panel";
 
 /* ── Mock data ────────────────────────────────────────────────────── */
 
@@ -217,6 +222,9 @@ const listings: Listing[] = [
 ];
 
 export default function MarketplacePage() {
+  const { hasRole } = useAuth();
+  const isAdmin = hasRole("admin");
+
   const [filter, setFilter] = useState("All");
   const [priceFilter, setPriceFilter] = useState("Any price");
   const [search, setSearch] = useState("");
@@ -402,6 +410,11 @@ export default function MarketplacePage() {
             <TabsTrigger value="my" className="text-xs">
               My Listings ({myListings.length})
             </TabsTrigger>
+            {isAdmin && (
+              <TabsTrigger value="moderation" className="text-xs">
+                Moderation
+              </TabsTrigger>
+            )}
           </TabsList>
 
           <TabsContent value="all" className="mt-4">
@@ -429,6 +442,12 @@ export default function MarketplacePage() {
               )}
             </div>
           </TabsContent>
+
+          {isAdmin && (
+            <TabsContent value="moderation" className="mt-0">
+              <MarketplaceModerationPanel />
+            </TabsContent>
+          )}
         </Tabs>
       </main>
 
@@ -526,9 +545,36 @@ export default function MarketplacePage() {
                       </Button>
                     </div>
                   )}
-                <button className="text-xs text-muted-foreground hover:text-foreground">
-                  {"Report listing"}
-                </button>
+                {!isAdmin ? (
+                  <button className="text-xs text-muted-foreground hover:text-foreground">
+                    {"Report listing"}
+                  </button>
+                ) : (
+                  <div className="pt-4 border-t space-y-3 mt-4">
+                    <p className="text-[10px] uppercase tracking-widest text-destructive font-bold flex items-center gap-1">
+                      <ShieldAlert className="h-3 w-3" /> Admin Tools
+                    </p>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        className="flex-1 text-xs h-8 border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 disabled:opacity-50"
+                        onClick={() => toast("Warning completely sent.")}
+                      >
+                        <AlertTriangle className="h-3 w-3 mr-1" /> Warn Seller
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="flex-1 text-xs h-8 border-destructive/30 bg-destructive/5 text-destructive hover:bg-destructive/10"
+                        onClick={() => {
+                          toast("Listing removed.");
+                          setSelectedListing(null);
+                        }}
+                      >
+                        <Trash2 className="h-3 w-3 mr-1" /> Force Removal
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             </>
           )}

@@ -22,8 +22,18 @@ import {
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Instagram, MessageCircle, Search, Users } from "lucide-react";
+import {
+  Instagram,
+  MessageCircle,
+  Search,
+  Users,
+  Plus,
+  ShieldCheck,
+  CheckCircle2,
+} from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/lib/auth/use-auth";
+import { ClubsManagePanel } from "./_components/clubs-manage-panel";
 
 /* ── Mock data ────────────────────────────────────────────────────── */
 
@@ -43,6 +53,7 @@ type Club = {
   upcomingEvents: { title: string; date: string }[];
   emoji: string;
   memberStatus: MemberStatus;
+  isAdvising?: boolean;
 };
 
 const CATEGORIES = [
@@ -80,6 +91,7 @@ const clubs: Club[] = [
     isActive: true,
     emoji: "📸",
     memberStatus: "none",
+    isAdvising: true,
     upcomingEvents: [
       { title: "Golden Hour Shoot", date: "Sat Apr 5 · Campus Rooftop" },
       { title: "Photo Editing Workshop", date: "Wed Apr 9 · Lab 3" },
@@ -174,6 +186,10 @@ const clubs: Club[] = [
 ];
 
 export default function ClubsPage() {
+  const { hasRole } = useAuth();
+  const isAdmin = hasRole("admin");
+  const isManager = hasRole("manager");
+
   const [activeCategory, setActiveCategory] = useState("All");
   const [search, setSearch] = useState("");
   const [selectedClub, setSelectedClub] = useState<Club | null>(null);
@@ -187,6 +203,7 @@ export default function ClubsPage() {
   });
 
   const myClubs = clubsState.filter((c) => c.memberStatus !== "none");
+  const myAdvisoryClubs = clubsState.filter((c) => c.isAdvising);
 
   function handleJoin(id: string) {
     const club = clubsState.find((c) => c.id === id);
@@ -283,14 +300,22 @@ export default function ClubsPage() {
               Discover and join student clubs on campus.
             </p>
           </div>
-          <div className="relative">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              className="pl-9 w-56"
-              placeholder="Search clubs..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+          <div className="flex gap-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                className="pl-9 w-56"
+                placeholder="Search clubs..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+            {isAdmin && (
+              <Button onClick={() => toast("Opening Create Club form...")}>
+                <Plus className="mr-2 h-4 w-4" />
+                Create Club
+              </Button>
+            )}
           </div>
         </div>
 
@@ -314,6 +339,16 @@ export default function ClubsPage() {
               <TabsTrigger value="my" className="text-xs">
                 My Clubs ({myClubs.length})
               </TabsTrigger>
+              {isManager && (
+                <TabsTrigger value="advisory" className="text-xs">
+                  My Advisory Clubs
+                </TabsTrigger>
+              )}
+              {isAdmin && (
+                <TabsTrigger value="manage" className="text-xs">
+                  Manage
+                </TabsTrigger>
+              )}
             </TabsList>
           </div>
 
@@ -404,6 +439,65 @@ export default function ClubsPage() {
               ))}
             </div>
           </TabsContent>
+
+          {isManager && (
+            <TabsContent value="advisory" className="mt-4">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {myAdvisoryClubs.map((club) => (
+                  <Card
+                    key={club.id}
+                    className="border-0 shadow-sm bg-card overflow-hidden cursor-pointer hover:shadow transition-shadow border-indigo-100"
+                    onClick={() => setSelectedClub(club)}
+                  >
+                    <div
+                      className={`h-16 bg-gradient-to-br ${CAT_GRADIENT[club.category]} flex items-center justify-center`}
+                    >
+                      <span className="text-3xl">{club.emoji}</span>
+                    </div>
+                    <CardContent className="px-4 py-3 flex flex-col gap-2">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-semibold text-sm">{club.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {club.members} members
+                          </p>
+                        </div>
+                        <Badge
+                          variant="outline"
+                          className="text-[10px] bg-indigo-50 text-indigo-700 border-indigo-200"
+                        >
+                          <ShieldCheck className="h-3 w-3 mr-1" />
+                          Advisor
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between mt-1">
+                        <span className="text-xs text-amber-600 font-medium">
+                          1 Pending Endorsement
+                        </span>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          className="h-6 text-xs px-2"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedClub(club);
+                          }}
+                        >
+                          Review
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+          )}
+
+          {isAdmin && (
+            <TabsContent value="manage" className="mt-0">
+              <ClubsManagePanel />
+            </TabsContent>
+          )}
         </Tabs>
       </main>
 
@@ -468,49 +562,81 @@ export default function ClubsPage() {
                   </Button>
                 </div>
 
-                {selectedClub.isActive && (
-                  <div className="pt-2" onClick={(e) => e.stopPropagation()}>
-                    {/* @ts-ignore – JoinButton accepts club prop */}
-                    {(() => {
-                      const JB = ({ club }: { club: Club }) => {
-                        if (club.memberStatus === "member")
-                          return (
-                            <Button className="w-full" variant="secondary">
-                              Joined ✓
-                            </Button>
-                          );
-                        if (club.memberStatus === "pending")
+                {isManager && selectedClub.isAdvising ? (
+                  <div className="pt-4 border-t space-y-4">
+                    <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">
+                      Advisory Tools
+                    </p>
+                    <div className="flex flex-col gap-2">
+                      <Button
+                        variant="outline"
+                        className="justify-start shadow-sm"
+                        onClick={() => toast("Viewing Member Roster...")}
+                      >
+                        <Users className="mr-2 h-4 w-4" /> View Full Roster
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="justify-start shadow-sm text-amber-700 bg-amber-50 hover:bg-amber-100 border-amber-200"
+                        onClick={() => toast("Endorsed pending event.")}
+                      >
+                        <CheckCircle2 className="mr-2 h-4 w-4" /> Endorse
+                        Outstanding Activity
+                      </Button>
+                      <Button
+                        variant="link"
+                        className="text-xs text-muted-foreground h-auto p-0 justify-start"
+                        onClick={() => toast("Requesting to step down...")}
+                      >
+                        Step down as Advisor
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  selectedClub.isActive && (
+                    <div className="pt-2" onClick={(e) => e.stopPropagation()}>
+                      {/* @ts-ignore – JoinButton accepts club prop */}
+                      {(() => {
+                        const JB = ({ club }: { club: Club }) => {
+                          if (club.memberStatus === "member")
+                            return (
+                              <Button className="w-full" variant="secondary">
+                                Joined ✓
+                              </Button>
+                            );
+                          if (club.memberStatus === "pending")
+                            return (
+                              <Button
+                                className="w-full"
+                                variant="outline"
+                                disabled
+                              >
+                                Application Pending
+                              </Button>
+                            );
+                          if (club.joinMethod === "open")
+                            return (
+                              <Button
+                                className="w-full"
+                                onClick={() => handleJoin(club.id)}
+                              >
+                                Join Club
+                              </Button>
+                            );
                           return (
                             <Button
                               className="w-full"
                               variant="outline"
-                              disabled
-                            >
-                              Application Pending
-                            </Button>
-                          );
-                        if (club.joinMethod === "open")
-                          return (
-                            <Button
-                              className="w-full"
                               onClick={() => handleJoin(club.id)}
                             >
-                              Join Club
+                              Apply to Join
                             </Button>
                           );
-                        return (
-                          <Button
-                            className="w-full"
-                            variant="outline"
-                            onClick={() => handleJoin(club.id)}
-                          >
-                            Apply to Join
-                          </Button>
-                        );
-                      };
-                      return <JB club={selectedClub} />;
-                    })()}
-                  </div>
+                        };
+                        return <JB club={selectedClub} />;
+                      })()}
+                    </div>
+                  )
                 )}
               </div>
             </>

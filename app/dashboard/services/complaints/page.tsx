@@ -30,8 +30,13 @@ import {
   FileWarning,
   MessageSquare,
   Plus,
+  ShieldCheck,
+  UserPlus,
 } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/lib/auth/use-auth";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ComplaintsManagePanel } from "./_components/complaints-manage-panel";
 
 /* ── Mock data ────────────────────────────────────────────────────── */
 
@@ -237,6 +242,10 @@ const CASE_TYPES: { type: CaseType; label: string; desc: string }[] = [
 ];
 
 export default function ComplaintsPage() {
+  const { hasRole } = useAuth();
+  const isAdmin = hasRole("admin");
+  const isManager = hasRole("manager");
+
   const [selectedCase, setSelectedCase] = useState<Case | null>(null);
   const [newOpen, setNewOpen] = useState(false);
   const [selectedCaseType, setSelectedCaseType] = useState<CaseType | null>(
@@ -293,80 +302,162 @@ export default function ComplaintsPage() {
           </Button>
         </div>
 
-        {/* Cases list */}
-        <div className="space-y-3">
-          {cases.length === 0 && (
-            <div className="py-16 text-center text-sm text-muted-foreground">
-              <FileWarning className="h-10 w-10 mx-auto mb-3 text-muted-foreground/30" />
-              No cases submitted yet.
-            </div>
-          )}
-          {cases.map((c) => (
-            <Card
-              key={c.id}
-              className={`border-0 shadow-sm bg-card cursor-pointer hover:shadow transition-shadow ${c.status === "info_requested" ? "ring-1 ring-amber-300" : ""}`}
-              onClick={() => setSelectedCase(c)}
-            >
-              <CardContent className="px-5 py-4">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span
-                        className={`text-[10px] px-2 py-0.5 rounded font-medium ${TYPE_COLOR[c.type]}`}
-                      >
-                        {TYPE_LABEL[c.type]}
-                      </span>
-                      <span
-                        className={`text-[10px] px-2 py-0.5 rounded font-medium ${STATUS_COLOR[c.status]}`}
-                      >
-                        {STATUS_LABEL[c.status]}
-                      </span>
-                      {c.messages.some((m) => m.role === "admin") &&
-                        c.status !== "resolved" && (
-                          <Badge variant="secondary" className="text-[10px]">
-                            {
-                              c.messages.filter((m) => m.role === "admin")
-                                .length
-                            }{" "}
-                            message
-                            {c.messages.filter((m) => m.role === "admin")
-                              .length > 1
-                              ? "s"
-                              : ""}
-                          </Badge>
-                        )}
-                    </div>
-                    <p className="font-semibold text-sm mt-1">{c.title}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {c.reference} · Submitted {c.submittedDate}
-                    </p>
-                    {c.status !== "resolved" && <StepRow status={c.status} />}
-                    {c.outcome && (
-                      <div
-                        className={`mt-2 text-xs px-2 py-1 rounded ${OUTCOME_COLOR[c.outcome]}`}
-                      >
-                        {c.outcomeNote}
-                      </div>
-                    )}
-                  </div>
-                  <Button
-                    size="sm"
-                    variant={
-                      c.status === "info_requested" ? "default" : "outline"
-                    }
-                    className="text-xs shrink-0"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedCase(c);
-                    }}
-                  >
-                    {c.status === "info_requested" ? "Respond" : "View Case"}
-                  </Button>
+        <Tabs defaultValue="my">
+          <TabsList className="h-8 mb-4">
+            <TabsTrigger value="my" className="text-xs">
+              My Complaints
+            </TabsTrigger>
+            {isManager && (
+              <TabsTrigger value="course" className="text-xs">
+                Course Feedback
+              </TabsTrigger>
+            )}
+            {isAdmin && (
+              <TabsTrigger value="manage" className="text-xs">
+                Manage
+              </TabsTrigger>
+            )}
+          </TabsList>
+
+          <TabsContent value="my" className="mt-0">
+            <div className="space-y-3">
+              {cases.length === 0 && (
+                <div className="py-16 text-center text-sm text-muted-foreground">
+                  <FileWarning className="h-10 w-10 mx-auto mb-3 text-muted-foreground/30" />
+                  No cases submitted yet.
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+              )}
+              {cases.map((c) => (
+                <Card
+                  key={c.id}
+                  className={`border-0 shadow-sm bg-card cursor-pointer hover:shadow transition-shadow ${c.status === "info_requested" ? "ring-1 ring-amber-300" : ""}`}
+                  onClick={() => setSelectedCase(c)}
+                >
+                  <CardContent className="px-5 py-4">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span
+                            className={`text-[10px] px-2 py-0.5 rounded font-medium ${TYPE_COLOR[c.type]}`}
+                          >
+                            {TYPE_LABEL[c.type]}
+                          </span>
+                          <span
+                            className={`text-[10px] px-2 py-0.5 rounded font-medium ${STATUS_COLOR[c.status]}`}
+                          >
+                            {STATUS_LABEL[c.status]}
+                          </span>
+                          {c.messages.some((m) => m.role === "admin") &&
+                            c.status !== "resolved" && (
+                              <Badge
+                                variant="secondary"
+                                className="text-[10px]"
+                              >
+                                {
+                                  c.messages.filter((m) => m.role === "admin")
+                                    .length
+                                }{" "}
+                                message
+                                {c.messages.filter((m) => m.role === "admin")
+                                  .length > 1
+                                  ? "s"
+                                  : ""}
+                              </Badge>
+                            )}
+                        </div>
+                        <p className="font-semibold text-sm mt-1">{c.title}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {c.reference} · Submitted {c.submittedDate}
+                        </p>
+                        {c.status !== "resolved" && (
+                          <StepRow status={c.status} />
+                        )}
+                        {c.outcome && (
+                          <div
+                            className={`mt-2 text-xs px-2 py-1 rounded ${OUTCOME_COLOR[c.outcome]}`}
+                          >
+                            {c.outcomeNote}
+                          </div>
+                        )}
+                      </div>
+                      <Button
+                        size="sm"
+                        variant={
+                          c.status === "info_requested" ? "default" : "outline"
+                        }
+                        className="text-xs shrink-0"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedCase(c);
+                        }}
+                      >
+                        {c.status === "info_requested"
+                          ? "Respond"
+                          : "View Case"}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          {isManager && (
+            <TabsContent value="course" className="mt-0">
+              <div className="space-y-3">
+                {cases
+                  .filter((c) => c.courseCode === "MTH 301")
+                  .map((c) => (
+                    <Card
+                      key={c.id}
+                      className="border-0 shadow-sm bg-card cursor-pointer hover:shadow transition-shadow"
+                      onClick={() => setSelectedCase(c)}
+                    >
+                      <CardContent className="px-5 py-4">
+                        <div className="flex flex-wrap items-start justify-between gap-3">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span
+                                className={`text-[10px] px-2 py-0.5 rounded font-medium ${TYPE_COLOR[c.type]}`}
+                              >
+                                {TYPE_LABEL[c.type]}
+                              </span>
+                              <Badge variant="outline" className="text-[10px]">
+                                Reference: {c.reference}
+                              </Badge>
+                            </div>
+                            <p className="font-semibold text-sm mt-1">
+                              Course Feedback against {c.courseCode}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                              {c.description}
+                            </p>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="text-xs shrink-0"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedCase(c);
+                            }}
+                          >
+                            Review & Respond
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+              </div>
+            </TabsContent>
+          )}
+
+          {isAdmin && (
+            <TabsContent value="manage" className="mt-0">
+              <ComplaintsManagePanel />
+            </TabsContent>
+          )}
+        </Tabs>
       </main>
 
       {/* Case detail sheet */}
@@ -466,27 +557,68 @@ export default function ComplaintsPage() {
                 )}
               </div>
 
+              {isAdmin && (
+                <div className="bg-amber-50 border border-amber-200 rounded-md p-3 mt-4">
+                  <p className="text-[10px] uppercase tracking-widest text-amber-800 font-bold flex items-center gap-1 mb-2">
+                    <ShieldCheck className="h-3 w-3" /> Admin Tools
+                  </p>
+                  <div className="space-y-3">
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 bg-white text-xs border-amber-300"
+                      >
+                        <UserPlus className="h-3 w-3 mr-1" /> Assign Staff
+                      </Button>
+                    </div>
+                    <div>
+                      <Label className="text-[10px] text-amber-800">
+                        Internal Notes (Hidden from Student)
+                      </Label>
+                      <Textarea
+                        placeholder="Add a private note..."
+                        className="h-16 text-xs bg-white border-amber-300 mt-1"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Reply box */}
               {selectedCase.status !== "resolved" && (
                 <div className="border-t pt-4 space-y-2 mt-4">
                   <Textarea
-                    placeholder="Write a reply..."
+                    placeholder={
+                      isManager
+                        ? "Submit formal lecturer response..."
+                        : "Write a reply..."
+                    }
                     rows={2}
                     className="resize-none text-sm"
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
                   />
-                  <div className="flex justify-end">
+                  <div className="flex justify-end pr-1">
+                    <span className="text-[10px] text-muted-foreground mr-auto mt-2">
+                      {isManager
+                        ? "Response will be sent privately to Admin."
+                        : "Visible to administration."}
+                    </span>
                     <Button
                       size="sm"
                       disabled={!replyText.trim()}
                       onClick={() => {
                         setReplyText("");
-                        toast("Reply sent.");
+                        toast(
+                          isManager
+                            ? "Lecturer Response Submitted."
+                            : "Reply sent.",
+                        );
                       }}
                     >
                       <MessageSquare className="h-4 w-4 mr-2" />
-                      Send Reply
+                      {isManager ? "Submit Response" : "Send Reply"}
                     </Button>
                   </div>
                 </div>

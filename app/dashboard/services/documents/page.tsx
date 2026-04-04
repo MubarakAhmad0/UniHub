@@ -32,6 +32,10 @@ import {
   Plus,
 } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/lib/auth/use-auth";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DocumentsManagePanel } from "./_components/documents-manage-panel";
+import { StaffDocumentsPanel } from "./_components/staff-documents-panel";
 
 /* ── Mock data ────────────────────────────────────────────────────── */
 
@@ -167,6 +171,10 @@ function StepRow({ status }: { status: RequestStatus }) {
 }
 
 export default function DocumentsPage() {
+  const { hasRole } = useAuth();
+  const isAdmin = hasRole("admin");
+  const isManager = hasRole("manager");
+
   const [newOpen, setNewOpen] = useState(false);
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [step, setStep] = useState(1);
@@ -219,63 +227,93 @@ export default function DocumentsPage() {
         </div>
 
         {/* Request list */}
-        <div className="space-y-3">
-          {myRequests.length === 0 && (
-            <div className="py-16 text-center text-sm text-muted-foreground">
-              <FileText className="h-10 w-10 mx-auto mb-3 text-muted-foreground/30" />
-              No requests yet — your documents will appear here.
-            </div>
-          )}
-          {myRequests.map((req) => (
-            <Card key={req.id} className="border-0 shadow-sm bg-card">
-              <CardContent className="px-5 py-4">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-semibold text-sm">{req.docType}</p>
-                      <span
-                        className={`text-[10px] px-2 py-0.5 rounded font-medium ${STATUS_COLOR[req.status]}`}
-                      >
-                        {STATUS_LABEL[req.status]}
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {req.reference} · Submitted {req.submittedDate}
-                      {req.estReady && ` · Est. ready: ${req.estReady}`}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      Purpose: {req.purpose}
-                    </p>
-                    {req.status !== "rejected" && (
-                      <StepRow status={req.status} />
-                    )}
-                    {req.adminNote && (
-                      <p className="text-xs text-destructive mt-1">
-                        Admin: {req.adminNote}
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    {req.status === "ready" && req.documentUrl && (
-                      <Button size="sm" asChild>
-                        <a href={req.documentUrl} download>
-                          <Download className="h-4 w-4 mr-2" />
-                          Download
-                        </a>
-                      </Button>
-                    )}
-                    {req.status === "processing" && (
-                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                        <Clock className="h-3.5 w-3.5" />
-                        Processing
+        <Tabs defaultValue="my">
+          <TabsList className="h-8 mb-4">
+            <TabsTrigger value="my" className="text-xs">
+              My Requests
+            </TabsTrigger>
+            {isManager && (
+              <TabsTrigger value="staff" className="text-xs">
+                Staff Docs
+              </TabsTrigger>
+            )}
+            {isAdmin && (
+              <TabsTrigger value="manage" className="text-xs">
+                Manage
+              </TabsTrigger>
+            )}
+          </TabsList>
+
+          <TabsContent value="my" className="mt-0 space-y-3">
+            {myRequests.length === 0 && (
+              <div className="py-16 text-center text-sm text-muted-foreground">
+                <FileText className="h-10 w-10 mx-auto mb-3 text-muted-foreground/30" />
+                No requests yet — your documents will appear here.
+              </div>
+            )}
+            {myRequests.map((req) => (
+              <Card key={req.id} className="border-0 shadow-sm bg-card">
+                <CardContent className="px-5 py-4">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="font-semibold text-sm">{req.docType}</p>
+                        <span
+                          className={`text-[10px] px-2 py-0.5 rounded font-medium ${STATUS_COLOR[req.status]}`}
+                        >
+                          {STATUS_LABEL[req.status]}
+                        </span>
                       </div>
-                    )}
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {req.reference} · Submitted {req.submittedDate}
+                        {req.estReady && ` · Est. ready: ${req.estReady}`}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Purpose: {req.purpose}
+                      </p>
+                      {req.status !== "rejected" && (
+                        <StepRow status={req.status} />
+                      )}
+                      {req.adminNote && (
+                        <p className="text-xs text-destructive mt-1">
+                          Admin: {req.adminNote}
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      {req.status === "ready" && req.documentUrl && (
+                        <Button size="sm" asChild>
+                          <a href={req.documentUrl} download>
+                            <Download className="h-4 w-4 mr-2" />
+                            Download
+                          </a>
+                        </Button>
+                      )}
+                      {req.status === "processing" && (
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <Clock className="h-3.5 w-3.5" />
+                          Processing
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                </CardContent>
+              </Card>
+            ))}
+          </TabsContent>
+
+          {isManager && (
+            <TabsContent value="staff" className="mt-0">
+              <StaffDocumentsPanel />
+            </TabsContent>
+          )}
+
+          {isAdmin && (
+            <TabsContent value="manage" className="mt-0">
+              <DocumentsManagePanel />
+            </TabsContent>
+          )}
+        </Tabs>
       </main>
 
       {/* New request dialog (2 steps) */}

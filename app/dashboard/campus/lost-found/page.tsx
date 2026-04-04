@@ -40,6 +40,8 @@ import {
   SmartphoneIcon,
 } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/lib/auth/use-auth";
+import { LostFoundManagePanel } from "./_components/lost-found-manage-panel";
 
 /* ── Types & mock data ────────────────────────────────────────────── */
 
@@ -191,6 +193,9 @@ const statusVariant: Record<
 };
 
 export default function LostFoundPage() {
+  const { hasRole } = useAuth();
+  const isAdmin = hasRole("admin");
+
   const [activeCategory, setActiveCategory] = useState("All");
   const [search, setSearch] = useState("");
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
@@ -343,6 +348,8 @@ export default function LostFoundPage() {
             <TabsTrigger value="found">
               Found ({filterReports("found").length})
             </TabsTrigger>
+            <TabsTrigger value="my">My Reports</TabsTrigger>
+            {isAdmin && <TabsTrigger value="manage">Manage</TabsTrigger>}
           </TabsList>
 
           {(["lost", "found"] as ReportType[]).map((type) => (
@@ -360,6 +367,26 @@ export default function LostFoundPage() {
               </div>
             </TabsContent>
           ))}
+
+          <TabsContent value="my" className="mt-4">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {reports.filter((r) => r.isOwn).length === 0 ? (
+                <p className="text-sm text-muted-foreground col-span-3 py-8 text-center">
+                  You haven&apos;t reported anything.
+                </p>
+              ) : (
+                reports
+                  .filter((r) => r.isOwn)
+                  .map((r) => <ReportCard key={r.id} r={r} />)
+              )}
+            </div>
+          </TabsContent>
+
+          {isAdmin && (
+            <TabsContent value="manage" className="mt-0">
+              <LostFoundManagePanel />
+            </TabsContent>
+          )}
         </Tabs>
       </main>
 
