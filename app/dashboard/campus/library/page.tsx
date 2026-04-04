@@ -18,11 +18,22 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@/lib/auth/use-auth";
 import { toast } from "sonner";
 import { useState } from "react";
+import { AcquisitionRequestSheet } from "./_components/acquisition-request-sheet";
+import { LibraryManagePanel } from "./_components/library-manage-panel";
 
 /* ── Mock data ────────────────────────────────────────────────────── */
 
@@ -243,6 +254,8 @@ const myBookings = [
     date: "Thu, Apr 3 2026",
     time: "12:00–13:00",
     status: "confirmed",
+    type: "personal",
+    linkedCourse: null,
   },
   {
     id: "b2",
@@ -250,7 +263,14 @@ const myBookings = [
     date: "Thu, Apr 3 2026",
     time: "13:00–14:00",
     status: "confirmed",
+    type: "class",
+    linkedCourse: "MTH 301",
   },
+];
+
+const myTeachingCourses = [
+  { id: "c1", code: "MTH 301" },
+  { id: "c2", code: "CS 105" },
 ];
 
 function slotColor(state: SlotState) {
@@ -264,11 +284,20 @@ function slotColor(state: SlotState) {
 }
 
 export default function LibraryPage() {
+  const { hasRole } = useAuth();
+  const isAdmin = hasRole("admin");
+  const isManager = hasRole("manager");
+
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [acquisitionOpen, setAcquisitionOpen] = useState(false);
   const [pendingBooking, setPendingBooking] = useState<{
     resource: Resource;
     slot: string;
   } | null>(null);
+
+  // Manager class booking toggle
+  const [isClassBooking, setIsClassBooking] = useState(false);
+  const [linkedCourse, setLinkedCourse] = useState<string>("");
 
   function handleSlotClick(resource: Resource, slotIdx: number) {
     if (resource.slots[slotIdx] !== "available") return;
@@ -279,8 +308,11 @@ export default function LibraryPage() {
   function confirmBooking() {
     setConfirmOpen(false);
     toast("Booking confirmed!", {
-      description: `${pendingBooking?.resource.name} · ${pendingBooking?.slot}`,
+      description: `${pendingBooking?.resource.name} · ${pendingBooking?.slot}${isClassBooking && linkedCourse ? ` (Class: ${myTeachingCourses.find((c) => c.id === linkedCourse)?.code})` : ""}`,
     });
+    // Reset booking form
+    setIsClassBooking(false);
+    setLinkedCourse("");
   }
 
   return (
@@ -299,47 +331,63 @@ export default function LibraryPage() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
+
+        {isManager && (
+          <div className="ml-auto flex items-center">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setAcquisitionOpen(true)}
+            >
+              Request Acquisition
+            </Button>
+          </div>
+        )}
       </header>
 
       <main className="flex-1 p-6 lg:p-8 space-y-6">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div className="space-y-0.5">
             <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-              Main Library
+              Main Library {isAdmin && "· Admin View"}
             </p>
             <h1 className="text-3xl font-bold tracking-tight">
               Library Booking
             </h1>
             <p className="text-sm text-muted-foreground">
-              Open 08:00–22:00 · Your bookings today: <strong>1 of 2</strong>
+              Open 08:00–22:00 · Your bookings today:{" "}
+              <strong>1 of {isManager ? "8" : "2"} max hours</strong>
             </p>
           </div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <span className="flex items-center gap-1.5">
-              <span className="inline-block w-3 h-3 rounded-sm bg-background border border-border/30" />
+              <span className="inline-block w-3 h-3 rounded-sm bg-background border border-border/30" />{" "}
               Available
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="inline-block w-3 h-3 rounded-sm bg-muted/60" />
+              <span className="inline-block w-3 h-3 rounded-sm bg-muted/60" />{" "}
               Booked
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="inline-block w-3 h-3 rounded-sm bg-primary" />
+              <span className="inline-block w-3 h-3 rounded-sm bg-primary" />{" "}
               Selected
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="inline-block w-3 h-3 rounded-sm bg-muted/30 border border-dashed" />
+              <span className="inline-block w-3 h-3 rounded-sm bg-muted/30 border border-dashed" />{" "}
               Closed
             </span>
           </div>
         </div>
 
         <Tabs defaultValue="rooms">
-          <TabsList>
+          <TabsList className="flex flex-wrap h-auto justify-start">
             <TabsTrigger value="seats">Seats</TabsTrigger>
             <TabsTrigger value="rooms">Discussion Rooms</TabsTrigger>
             <TabsTrigger value="equipment">Equipment</TabsTrigger>
             <TabsTrigger value="my">My Bookings</TabsTrigger>
+            {isAdmin && (
+              <TabsTrigger value="manage">Manage (Admin)</TabsTrigger>
+            )}
           </TabsList>
 
           {[
@@ -417,13 +465,23 @@ export default function LibraryPage() {
               <Card key={b.id} className="border-0 shadow-sm bg-card">
                 <CardContent className="px-5 py-4 flex items-center justify-between gap-4">
                   <div>
-                    <p className="font-semibold text-sm">{b.resource}</p>
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="font-semibold text-sm">{b.resource}</p>
+                      <Badge
+                        variant={b.type === "class" ? "default" : "secondary"}
+                        className="text-[10px]"
+                      >
+                        {b.type === "class"
+                          ? `Class (${b.linkedCourse})`
+                          : "Personal"}
+                      </Badge>
+                    </div>
                     <p className="text-xs text-muted-foreground">
                       {b.date} · {b.time}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant="secondary">{b.status}</Badge>
+                    <Badge variant="outline">{b.status}</Badge>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -436,43 +494,112 @@ export default function LibraryPage() {
               </Card>
             ))}
           </TabsContent>
+
+          {isAdmin && (
+            <TabsContent value="manage" className="mt-4">
+              <LibraryManagePanel />
+            </TabsContent>
+          )}
         </Tabs>
       </main>
 
-      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+      <Dialog
+        open={confirmOpen}
+        onOpenChange={(v) => {
+          setConfirmOpen(v);
+          if (!v) {
+            setIsClassBooking(false);
+            setLinkedCourse("");
+          }
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Confirm Booking</DialogTitle>
           </DialogHeader>
-          <div className="text-sm space-y-2 py-2">
-            <p>
-              <span className="text-muted-foreground">Resource:</span>{" "}
-              {pendingBooking?.resource.name}
-            </p>
-            <p>
-              <span className="text-muted-foreground">Date:</span> Thu, Apr 3
-              2026
-            </p>
-            <p>
-              <span className="text-muted-foreground">Time:</span>{" "}
-              {pendingBooking?.slot} –{" "}
-              {pendingBooking
-                ? (SLOTS[SLOTS.indexOf(pendingBooking.slot) + 1] ?? "end")
-                : ""}
-            </p>
-            <p>
-              <span className="text-muted-foreground">Location:</span>{" "}
-              {pendingBooking?.resource.location}
-            </p>
+          <div className="text-sm space-y-4 py-2">
+            <div className="space-y-2">
+              <p>
+                <span className="text-muted-foreground">Resource:</span>{" "}
+                {pendingBooking?.resource.name}
+              </p>
+              <p>
+                <span className="text-muted-foreground">Date:</span> Thu, Apr 3
+                2026
+              </p>
+              <p>
+                <span className="text-muted-foreground">Time:</span>{" "}
+                {pendingBooking?.slot} –{" "}
+                {pendingBooking
+                  ? (SLOTS[SLOTS.indexOf(pendingBooking.slot) + 1] ?? "end")
+                  : ""}
+              </p>
+              <p>
+                <span className="text-muted-foreground">Location:</span>{" "}
+                {pendingBooking?.resource.location}
+              </p>
+            </div>
+
+            {isManager && (
+              <div className="bg-muted/40 p-3 rounded-lg space-y-3 border border-border/50">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <label
+                      htmlFor="class-booking"
+                      className="text-sm font-medium"
+                    >
+                      Book for a class
+                    </label>
+                    <p className="text-xs text-muted-foreground">
+                      Overrides standard booking limits.
+                    </p>
+                  </div>
+                  <Switch
+                    id="class-booking"
+                    checked={isClassBooking}
+                    onCheckedChange={setIsClassBooking}
+                  />
+                </div>
+                {isClassBooking && (
+                  <div className="pt-1">
+                    <Select
+                      value={linkedCourse}
+                      onValueChange={setLinkedCourse}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select course…" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {myTeachingCourses.map((c) => (
+                          <SelectItem key={c.id} value={c.id}>
+                            {c.code}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={confirmBooking}>Confirm Booking</Button>
+            <Button
+              onClick={confirmBooking}
+              disabled={isClassBooking && !linkedCourse}
+            >
+              Confirm Booking
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AcquisitionRequestSheet
+        open={acquisitionOpen}
+        onOpenChange={setAcquisitionOpen}
+      />
     </div>
   );
 }

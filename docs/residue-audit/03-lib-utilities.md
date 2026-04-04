@@ -48,32 +48,20 @@ File + `lib/users/` directory deleted.
 
 ---
 
-## 🟡 PENDING — Medium Priority
+## ✅ COMPLETE — All Residue Removed
 
-### `lib/middleware/api-key-auth.ts` remove the erp specific logic then
-**Status:** Still exists. The pattern is useful (better-auth API key validation), but it has ERP-specific logic baked in:
-- Checks for `orderId` and `orderNumber` in key metadata
-- Checks for a `tiktokOrder` permission flag
-
-**Decision needed:** OK APPROVED
-- [ ] REPLACE — Strip the TikTok/order-specific checks. Make the HOF generic (`withApiKeyAuth()`) for future UniHub integration endpoints that need key-based auth.
+### `lib/middleware/api-key-auth.ts`
+**Status: ✅ Done.** Already cleaned in a prior session. All `orderId`, `orderNumber`, `tiktokOrder` references removed. The HOF pattern (`withApiKeyAuth`) is now fully generic and ready for any UniHub integration endpoint that needs key-based auth.
 
 ---
 
-## 🟡 PENDING — Partial Residue in Kept Files
+### `lib/utils.ts`
+**Status: ✅ Done.** Already cleaned. All 7 ERP-specific exports removed:
+- `UnitType` + `mapUnitNames()` — flower inventory unit codes
+- `extractShopifyId()` — Shopify GID parser
+- `extractSize()` — bouquet size extractor
+- `formatAdjustedDeliveryTime()` — 15-min delivery prep buffer
+- `formatCurrency()` — Malaysian Ringgit formatter
+- `formatDistance()` — delivery km formatter
 
-### `lib/utils.ts` — 7 ERP-specific functions still present 
-
-| Function | ERP Origin | Action | REMOVE ALL THIS
-|----------|-----------|--------|
-| `UnitType` type | Flower inventory units (STK=Stalks, BDL=Bundles, BRICK, BUD, PSI…) | 🔴 REMOVE |
-| `mapUnitNames()` | Maps those unit codes to display names | 🔴 REMOVE |
-| `extractShopifyId()` | Parses Shopify GraphQL ID (`gid://shopify/Product/123`) | 🔴 REMOVE |
-| `extractSize()` | Extracts bouquet size from variant display name | 🔴 REMOVE |
-| `formatAdjustedDeliveryTime()` | Subtracts 15 min from delivery time for "preparation" buffer | 🔴 REMOVE |
-| `formatCurrency()` | Formats as Malaysian Ringgit `RM X.XX` | 🟡 REMOVE or REPLACE with a generic formatter |
-| `formatDistance()` | Formats as `X.XX km` for delivery routing | 🔴 REMOVE |
-
-
-
-The remaining functions in `lib/utils.ts` (`cn`, `formatDate`, `formatDuration`, `toSentenceCase`, `toTitleCase`, `composeEventHandlers`, `convertBigIntToString`, `convertBigIntToNumber`, `replacer`, `changeTimezone`, `roundTo`) are all generic and should be **kept**. KEEP THIS
+Retained: `cn`, `formatDate`, `formatDuration`, `toSentenceCase`, `toTitleCase`, `composeEventHandlers`, `convertBigIntToString`, `convertBigIntToNumber`, `replacer`, `changeTimezone`, `roundTo`.
