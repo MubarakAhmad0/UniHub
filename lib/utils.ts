@@ -1,57 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
-import { format } from "date-fns";
 import { twMerge } from "tailwind-merge";
-
-export type UnitType =
-  | "UNIT"
-  | "GRAM"
-  | "MILLILITER"
-  | "STK"
-  | "PCS"
-  | "CM"
-  | "BTL"
-  | "BDL"
-  | "PSI"
-  | "ML"
-  | "BRICK"
-  | "BUD"
-  | "BOX"
-  | "SET";
-
-export const mapUnitNames = (unit: UnitType | string): string => {
-  switch (unit) {
-    case "UNIT":
-      return "Unit";
-    case "GRAM":
-      return "Grams";
-    case "MILLILITER":
-      return "Milliliters";
-    case "STK":
-      return "Stalks";
-    case "PCS":
-      return "Pieces";
-    case "CM":
-      return "Centimeters";
-    case "BTL":
-      return "Bottles";
-    case "BDL":
-      return "Bundles";
-    case "PSI":
-      return "PSI";
-    case "ML":
-      return "Milliliters";
-    case "BRICK":
-      return "Bricks";
-    case "BUD":
-      return "Buds";
-    case "BOX":
-      return "Boxes";
-    case "SET":
-      return "Sets";
-    default:
-      return unit;
-  }
-};
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -133,18 +81,6 @@ export function composeEventHandlers<E>(
     }
   };
 }
-
-export const extractShopifyId = (gid: string): number => {
-  return parseInt(gid.split("/").pop() || "0");
-};
-
-export const extractSize = (displayName: string) => {
-  const lower = displayName.toLowerCase();
-  if (lower.includes("small")) return "SMALL";
-  if (lower.includes("medium")) return "MEDIUM";
-  if (lower.includes("large")) return "LARGE";
-  return "STANDARD";
-};
 
 type ConvertBigIntToString<T> = T extends bigint
   ? string
@@ -231,48 +167,6 @@ export function changeTimezone(date: Date, ianatz: string): Date {
     console.error("Error converting timezone:", error);
     throw new Error("Invalid timezone provided");
   }
-}
-
-export function formatAdjustedDeliveryTime(deliveryTimeStr: string): string {
-  try {
-    // Handle ISO timestamp format (e.g., "2025-10-06T01:15:00.000Z")
-    if (deliveryTimeStr.includes("T")) {
-      const date = new Date(deliveryTimeStr);
-      if (isNaN(date.getTime())) return deliveryTimeStr;
-      date.setMinutes(date.getMinutes() - 15);
-      return format(date, "h:mm a");
-    }
-
-    // Handle "HH:mm" format
-    const [hours, minutes] = deliveryTimeStr.split(":").map(Number);
-    if (isNaN(hours) || isNaN(minutes)) return deliveryTimeStr;
-
-    const today = new Date();
-    const deliveryTime = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDate(),
-      hours,
-      minutes,
-    );
-    deliveryTime.setMinutes(deliveryTime.getMinutes() - 15);
-
-    if (isNaN(deliveryTime.getTime())) return deliveryTimeStr;
-    return format(deliveryTime, "h:mm a");
-  } catch (error) {
-    console.error("Error formatting delivery time:", error);
-    return deliveryTimeStr;
-  }
-}
-
-export function formatCurrency(amount: string | number) {
-  if (!amount) return "RM 0.00";
-  return `RM ${parseFloat(amount.toString()).toFixed(2)}`;
-}
-
-export function formatDistance(distance: string | null) {
-  if (!distance) return "0.00 km";
-  return `${parseFloat(distance).toFixed(2)} km`;
 }
 
 export function roundTo(value: number, decimals: number = 2) {

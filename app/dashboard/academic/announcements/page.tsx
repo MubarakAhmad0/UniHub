@@ -2,8 +2,6 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -14,20 +12,20 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Check } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@/lib/auth/use-auth";
+import { Plus, Settings2 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
+import {
+  AnnouncementCard,
+  type Announcement,
+} from "./_components/announcement-card";
+import { ManageTab } from "./_components/manage-tab";
+import { PostAnnouncementSheet } from "./_components/post-announcement-sheet";
 
-type AnnouncementType = "system" | "faculty" | "event";
-
-const announcements: {
-  id: number;
-  date: string;
-  title: string;
-  body: string;
-  type: AnnouncementType;
-  priority: "high" | "normal";
-  read: boolean;
-}[] = [
+// ─── Mock data ────────────────────────────────────────────────────────────────
+const INITIAL_ANNOUNCEMENTS: Announcement[] = [
   {
     id: 1,
     date: "Apr 2, 2026",
@@ -36,6 +34,10 @@ const announcements: {
     type: "system",
     priority: "high",
     read: false,
+    author: "Registry Office",
+    isPinned: true,
+    status: "published",
+    audience: "University-wide",
   },
   {
     id: 2,
@@ -45,6 +47,10 @@ const announcements: {
     type: "faculty",
     priority: "normal",
     read: false,
+    author: "Prof. Vane",
+    isPinned: false,
+    status: "published",
+    courseCode: "ARC 402",
   },
   {
     id: 3,
@@ -54,6 +60,10 @@ const announcements: {
     type: "event",
     priority: "normal",
     read: true,
+    author: "Library Services",
+    isPinned: false,
+    status: "published",
+    audience: "University-wide",
   },
   {
     id: 4,
@@ -63,6 +73,10 @@ const announcements: {
     type: "faculty",
     priority: "high",
     read: false,
+    author: "Prof. Elena Rossi",
+    isPinned: false,
+    status: "published",
+    courseCode: "CS 105",
   },
   {
     id: 5,
@@ -72,6 +86,10 @@ const announcements: {
     type: "system",
     priority: "normal",
     read: true,
+    author: "IT Department",
+    isPinned: false,
+    status: "published",
+    audience: "University-wide",
   },
   {
     id: 6,
@@ -81,46 +99,97 @@ const announcements: {
     type: "event",
     priority: "normal",
     read: true,
+    author: "Research Office",
+    isPinned: false,
+    status: "published",
+    audience: "University-wide",
   },
 ];
 
-const typeLabel: Record<AnnouncementType, string> = {
-  system: "System",
-  faculty: "Faculty",
-  event: "Event",
-};
+// ─── Mock "my" author name — replaced when real auth provides display name ────
+const MY_AUTHOR_NAME = "Prof. Elena Rossi";
 
-const typeVariant: Record<
-  AnnouncementType,
-  "default" | "secondary" | "outline"
-> = {
-  system: "default",
-  faculty: "secondary",
-  event: "outline",
-};
-
+// ─── Page ─────────────────────────────────────────────────────────────────────
 export default function AnnouncementsPage() {
+  const { hasRole, isLoading } = useAuth();
+
+  const isAdmin = hasRole("admin");
+  const isManager = hasRole("manager");
+  const canPost = isAdmin || isManager;
+
+  const [items, setItems] = useState<Announcement[]>(INITIAL_ANNOUNCEMENTS);
   const [readIds, setReadIds] = useState<Set<number>>(
-    new Set(announcements.filter((a) => a.read).map((a) => a.id)),
+    new Set(INITIAL_ANNOUNCEMENTS.filter((a) => a.read).map((a) => a.id)),
   );
   const [activeTab, setActiveTab] = useState("all");
+  const [postOpen, setPostOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<Announcement | null>(null);
 
+  // ── Helpers ──────────────────────────────────────────────────────────────────
   const toggleRead = (id: number) => {
     setReadIds((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      next.has(id) ? next.delete(id) : next.add(id);
       return next;
     });
   };
 
-  const filtered =
-    activeTab === "all"
-      ? announcements
-      : announcements.filter((a) => a.type === activeTab);
+  const handleSave = (item: Announcement) => {
+    setItems((prev) => {
+      const idx = prev.findIndex((a) => a.id === item.id);
+      if (idx >= 0) {
+        const next = [...prev];
+        next[idx] = item;
+        return next;
+      }
+      return [item, ...prev];
+    });
+  };
+
+  const handleDelete = (id: number) => {
+    setItems((prev) => prev.filter((a) => a.id !== id));
+    toast.success("Announcement deleted.");
+  };
+
+  const handleTogglePin = (id: number) => {
+    setItems((prev) =>
+      prev.map((a) => (a.id === id ? { ...a, isPinned: !a.isPinned } : a)),
+    );
+  };
+
+  const handleArchive = (id: number) => {
+    setItems((prev) =>
+      prev.map((a) => (a.id === id ? { ...a, status: "archived" } : a)),
+    );
+  };
+
+  const openEdit = (item: Announcement) => {
+    setEditingItem(item);
+    setPostOpen(true);
+  };
+
+  const closeSheet = () => {
+    setPostOpen(false);
+    setEditingItem(null);
+  };
+
+  // Sort: pinned first, then by id descending
+  const sorted = [...items].sort((a, b) => {
+    if (a.isPinned && !b.isPinned) return -1;
+    if (!a.isPinned && b.isPinned) return 1;
+    return b.id - a.id;
+  });
+
+  const getFiltered = (tab: string) =>
+    tab === "all" ? sorted : sorted.filter((a) => a.type === tab);
+
+  const unreadCount = items.filter((a) => !readIds.has(a.id)).length;
+
+  const TABS = ["all", "system", "faculty", "event"] as const;
 
   return (
     <div className="flex flex-col min-h-svh">
+      {/* ── Header ── */}
       <header className="flex h-14 shrink-0 items-center gap-2 border-b bg-background px-4">
         <SidebarTrigger className="-ml-1" />
         <Separator orientation="vertical" className="mr-2 h-4" />
@@ -135,88 +204,124 @@ export default function AnnouncementsPage() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
+
+        {/* Role-gated action button */}
+        {!isLoading && canPost && (
+          <div className="ml-auto">
+            <Button
+              size="sm"
+              onClick={() => setPostOpen(true)}
+              id="new-announcement-btn"
+            >
+              <Plus className="h-4 w-4 mr-1" />
+              New Announcement
+            </Button>
+          </div>
+        )}
       </header>
 
+      {/* ── Main ── */}
       <main className="flex-1 p-6 lg:p-8 space-y-8">
-        <div className="space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-            Academic Portal
-          </p>
-          <h1 className="text-3xl font-bold tracking-tight">Announcements</h1>
-          <p className="text-sm text-muted-foreground">
-            University-wide notices, faculty updates, and campus events.
-          </p>
+        <div className="flex items-start justify-between gap-4">
+          <div className="space-y-1">
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+              Academic Portal
+            </p>
+            <h1 className="text-3xl font-bold tracking-tight">Announcements</h1>
+            <p className="text-sm text-muted-foreground">
+              University-wide notices, faculty updates, and campus events.
+            </p>
+          </div>
+
+          {/* Unread badge */}
+          {unreadCount > 0 && (
+            <Badge variant="secondary" className="shrink-0 mt-1">
+              {unreadCount} unread
+            </Badge>
+          )}
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="bg-muted">
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="system">System</TabsTrigger>
-            <TabsTrigger value="faculty">Faculty</TabsTrigger>
-            <TabsTrigger value="event">Events</TabsTrigger>
+            {TABS.map((tab) => (
+              <TabsTrigger key={tab} value={tab} className="capitalize">
+                {tab === "all"
+                  ? "All"
+                  : tab === "event"
+                    ? "Events"
+                    : tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </TabsTrigger>
+            ))}
+            {/* Admin-only Manage tab */}
+            {isAdmin && (
+              <TabsTrigger value="manage" id="manage-tab-trigger">
+                <Settings2 className="h-3.5 w-3.5 mr-1" />
+                Manage
+              </TabsTrigger>
+            )}
           </TabsList>
 
-          {(["all", "system", "faculty", "event"] as const).map((tab) => (
-            <TabsContent key={tab} value={tab} className="mt-6 space-y-3">
-              {(tab === "all"
-                ? announcements
-                : announcements.filter((a) => a.type === tab)
-              ).map((item) => {
-                const isRead = readIds.has(item.id);
-                return (
-                  <Card
-                    key={item.id}
-                    className={`shadow-sm border-0 transition-opacity ${isRead ? "opacity-60" : ""}`}
-                  >
-                    <CardHeader className="pb-2 space-y-2">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                              {item.date}
-                            </p>
-                            <Badge
-                              variant={typeVariant[item.type]}
-                              className="text-xs"
-                            >
-                              {typeLabel[item.type]}
-                            </Badge>
-                            {item.priority === "high" && (
-                              <Badge variant="destructive" className="text-xs">
-                                Priority
-                              </Badge>
-                            )}
-                          </div>
-                          <h2
-                            className={`text-sm font-semibold leading-snug ${isRead ? "font-normal" : ""}`}
-                          >
-                            {item.title}
-                          </h2>
-                        </div>
-                        <Button
-                          size="icon"
-                          variant={isRead ? "outline" : "ghost"}
-                          className="h-7 w-7 shrink-0"
-                          onClick={() => toggleRead(item.id)}
-                          id={`read-toggle-${item.id}`}
-                          title={isRead ? "Mark unread" : "Mark as read"}
-                        >
-                          <Check className="h-3.5 w-3.5" />
-                        </Button>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        {item.body}
-                      </p>
-                    </CardContent>
-                  </Card>
-                );
-              })}
+          {/* Standard announcement tabs */}
+          {TABS.map((tab) => {
+            const list = getFiltered(tab);
+            return (
+              <TabsContent key={tab} value={tab} className="mt-6 space-y-3">
+                {list.length === 0 ? (
+                  <p className="text-sm text-muted-foreground py-8 text-center">
+                    No announcements in this category yet.
+                  </p>
+                ) : (
+                  list.map((item) => (
+                    <AnnouncementCard
+                      key={item.id}
+                      item={item}
+                      isRead={readIds.has(item.id)}
+                      onToggleRead={toggleRead}
+                      isOwner={isManager && item.author === MY_AUTHOR_NAME}
+                      canAdmin={isAdmin}
+                      onEdit={() => openEdit(item)}
+                      onDelete={() => handleDelete(item.id)}
+                      onPin={() => {
+                        handleTogglePin(item.id);
+                        toast.success("Announcement pinned.");
+                      }}
+                      onUnpin={() => {
+                        handleTogglePin(item.id);
+                        toast.success("Announcement unpinned.");
+                      }}
+                      onArchive={() => handleArchive(item.id)}
+                    />
+                  ))
+                )}
+              </TabsContent>
+            );
+          })}
+
+          {/* Admin Manage tab */}
+          {isAdmin && (
+            <TabsContent value="manage" className="mt-6">
+              <ManageTab
+                announcements={items}
+                onEdit={openEdit}
+                onDelete={handleDelete}
+                onTogglePin={handleTogglePin}
+                onArchive={handleArchive}
+              />
             </TabsContent>
-          ))}
+          )}
         </Tabs>
       </main>
+
+      {/* Post / Edit sheet */}
+      {canPost && (
+        <PostAnnouncementSheet
+          open={postOpen}
+          onClose={closeSheet}
+          role={isAdmin ? "admin" : "manager"}
+          editingItem={editingItem}
+          onSave={handleSave}
+        />
+      )}
     </div>
   );
 }

@@ -3,77 +3,49 @@ import { auth } from "@/lib/auth";
 
 export interface ApiKeyValidationResult {
   success: boolean;
-  orderId?: string;
-  orderNumber?: string;
+  keyId?: string;
   error?: string;
 }
 
 export interface AuthenticatedRequest extends NextRequest {
   apiKeyData?: {
-    orderId: string;
-    orderNumber: string;
-    metadata: Record<string, any>;
+    keyId: string;
+    metadata: Record<string, unknown>;
   };
 }
 
 /**
- * Middleware to validate API key for TikTok order endpoints
- * Returns validation result and sets request data if successful
+ * Validates a better-auth API key from the `x-api-key` request header.
+ * Use this for protecting integration endpoints that need key-based auth
+ * without requiring a user session.
  */
 export async function validateApiKey(
   request: NextRequest,
 ): Promise<ApiKeyValidationResult> {
   try {
-    // Extract API key from header
     const apiKey = request.headers.get("x-api-key");
 
     if (!apiKey) {
       return {
         success: false,
-        error: "API key is required. Please verify your order first.",
+        error: "API key is required.",
       };
     }
 
-    // Verify API key with better-auth
     const verification = await auth.api.verifyApiKey({
-      body: {
-        key: apiKey,
-      },
+      body: { key: apiKey },
     });
 
     if (!verification.valid || !verification.key) {
       return {
         success: false,
-        error: "Invalid or expired API key. Please verify your order again.",
+        error: "Invalid or expired API key.",
       };
     }
-
-    const keyData = verification.key;
-
-    // Validate metadata
-    const metadata = keyData.metadata;
-    if (!metadata?.orderId || !metadata?.orderNumber) {
-      return {
-        success: false,
-        error: "Invalid session data. Please verify your order again.",
-      };
-    }
-
-    // Validate permissions for TikTok operations
-    const permissions = keyData.permissions;
-    if (!permissions?.tiktokOrder) {
-      return {
-        success: false,
-        error: "Insufficient permissions for this operation.",
-      };
-    }
-
-    console.log(`✅ API key validated for TikTok order ${metadata.orderId}`);
 
     return {
       success: true,
-      orderId: metadata.orderId,
-      orderNumber: metadata.orderNumber,
+      keyId: verification.key.id,
     };
   } catch (error) {
     console.error("API key validation error:", error);
@@ -85,9 +57,15 @@ export async function validateApiKey(
 }
 
 /**
- * Higher-order function to protect API routes with API key authentication
+ * Higher-order function to protect API routes with API key authentication.
+ *
+ * @example
+ * export const POST = withApiKeyAuth(async (req) => {
+ *   const { keyId } = req.apiKeyData!;
+ *   return NextResponse.json({ ok: true });
+ * });
  */
-export function withApiKeyAuth<T extends any[]>(
+export function withApiKeyAuth<T extends unknown[]>(
   handler: (request: AuthenticatedRequest, ...args: T) => Promise<NextResponse>,
 ) {
   return async (request: NextRequest, ...args: T): Promise<NextResponse> => {
@@ -95,20 +73,15 @@ export function withApiKeyAuth<T extends any[]>(
 
     if (!validation.success) {
       return NextResponse.json(
-        {
-          success: false,
-          error: validation.error,
-        },
+        { success: false, error: validation.error },
         { status: 401 },
       );
     }
 
-    // Add API key data to request for use in handler
     const authenticatedRequest = request as AuthenticatedRequest;
     authenticatedRequest.apiKeyData = {
-      orderId: validation.orderId!,
-      orderNumber: validation.orderNumber!,
-      metadata: {}, // Can be expanded as needed
+      keyId: validation.keyId!,
+      metadata: {},
     };
 
     return handler(authenticatedRequest, ...args);
@@ -116,14 +89,15 @@ export function withApiKeyAuth<T extends any[]>(
 }
 
 /**
- * CORS headers for TikTok form domain
+ * CORS headers for API key protected routes.
+ * Configure ALLOWED_ORIGINS via environment variables as needed.
  */
 export function getCorsHeaders(origin?: string): Record<string, string> {
   const allowedOrigins = [
-    process.env.TIKTOK_FORM_DOMAIN,
-    "http://localhost:5173", // Vite dev server
-    "http://localhost:3000", // Next.js dev server
-  ].filter(Boolean);
+    process.env.ALLOWED_ORIGIN,
+    "http://localhost:5173",
+    "http://localhost:3000",
+  ].filter(Boolean) as string[];
 
   const isAllowedOrigin = origin && allowedOrigins.includes(origin);
 
@@ -133,19 +107,17 @@ export function getCorsHeaders(origin?: string): Record<string, string> {
       : allowedOrigins[0] || "*",
     "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, x-api-key",
-    "Access-Control-Max-Age": "86400", // 24 hours
+    "Access-Control-Max-Age": "86400",
   };
 }
 
 /**
- * Handle OPTIONS requests for CORS preflight
+ * Handle OPTIONS preflight requests for CORS.
  */
 export function handleCorsOptions(request: NextRequest): NextResponse {
   const origin = request.headers.get("origin");
-  const corsHeaders = getCorsHeaders(origin || undefined);
-
   return new NextResponse(null, {
     status: 200,
-    headers: corsHeaders,
+    headers: getCorsHeaders(origin || undefined),
   });
 }
