@@ -96,9 +96,11 @@ pnpm exec tsx scripts/assign-role.ts your@email.com admin
 app/
   (admin-module)/admin/     # Admin: users, roles, permissions
   dashboard/
-    academic/               # Courses, marks, attendance, announcements, study plan
+    academic/               # Courses, marks, attendance, study plan
+    announcements/          # System-wide announcements board
     campus/                 # Events, forums, library, map, venues, timetable
     community/              # Clubs, marketplace
+    profile/                # User profile and settings
     services/               # Complaints, documents, finances
   api/
     auth/                   # better-auth handlers

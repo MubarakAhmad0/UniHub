@@ -47,9 +47,11 @@ pnpm artisan:plop  # Scaffold a new DataTable module (queries, actions, validati
 |---|---|
 | Login page | `app/page.tsx` |
 | Dashboard shell | `app/dashboard/layout.tsx` |
+| General/Announcements | `app/dashboard/announcements/` |
 | Academic section | `app/dashboard/academic/` |
 | Campus section | `app/dashboard/campus/` |
 | Community section | `app/dashboard/community/` |
+| Profile section | `app/dashboard/profile/` |
 | Services section | `app/dashboard/services/` |
 | Admin portal | `app/(admin-module)/admin/` |
 | oRPC API endpoint | `app/api/rpc/` |

@@ -25,10 +25,7 @@ db/
       verifications.ts        # OTP/email verification tokens
     core/
       users.ts                # Extended user table
-      branches.ts             # Campus branches / locations
       departments.ts          # Academic/admin departments
-      customers.ts            # Customer records
-      addresses.ts            # Address records
     enums.ts                  # All pgEnum definitions
     types.ts                  # TypeScript types inferred from schema
     utils.ts                  # Shared column helpers (timestamps, etc.)
@@ -42,8 +39,7 @@ db/
 ### Core Application Tables
 | Table | Key columns | Description |
 |---|---|---|
-| `users` | `id`, `email`, `name`, `role`, `departmentId`, `branchId`, `isActive` | Extended better-auth users |
-| `branches` | `id`, `name` | Physical campus or branch locations |
+| `users` | `id`, `email`, `name`, `role`, `departmentId`, `isActive` | Extended better-auth users (uses \`studentId\`) |
 | `departments` | `id`, `name` | Academic or administrative departments |
 
 ### Auth / RBAC Tables (in `db/schema/auth/`)

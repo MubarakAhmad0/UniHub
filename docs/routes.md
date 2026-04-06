@@ -29,12 +29,17 @@ Unauthenticated users hitting protected routes are redirected to `/`.
 | `unauthorized/` | 403 access denied page |
 
 ## Dashboard Sections (`app/dashboard/`)
+### General & Profile
+| Route | Description |
+|---|---|
+| `announcements` | System-wide announcements board |
+| `profile` | User profile and account settings |
+
 ### Academic
 | Route | Description |
 |---|---|
 | `academic/courses` | Course catalog — browse all available courses |
 | `academic/my-courses` | Enrolled courses for the current student |
-| `academic/announcements` | Announcements from lecturers or admin |
 | `academic/study-plan` | Student's degree study plan |
 | `academic/marks` | Academic marks and GPA tracker |
 | `academic/attendance` | Attendance records |

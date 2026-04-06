@@ -72,6 +72,7 @@ export function NavSection() {
 | `nav-academic.tsx` | Academic | `"academic"` |
 | `nav-campus.tsx` | Campus | `"campus"` |
 | `nav-community.tsx` | Community | `"community"` |
+| `nav-general.tsx` | General (Announcements) | `"general"` |
 | `nav-services.tsx` | Services | `"services"` |
 | `nav-admin.tsx` | Admin | `"admin"` |
 
