@@ -4,9 +4,8 @@ import { Toaster } from "@/components/ui/sonner";
 // import { redirect } from "next/navigation";
 import React from "react";
 import { LandingNav } from "./_components/landing/landing-nav";
-import { LandingHero } from "./_components/landing/landing-hero";
+import { CampusScroll } from "@/components/campus-scroll";
 import { LandingFeatures } from "./_components/landing/landing-features";
-import { LandingAnnouncements } from "./_components/landing/landing-announcements";
 import { LandingFooter } from "./_components/landing/landing-footer";
 
 export default async function LoginPage() {
@@ -17,14 +16,11 @@ export default async function LoginPage() {
   // }
 
   return (
-    <div className="flex min-h-screen flex-col font-sans">
+    <div className="flex min-h-screen flex-col font-sans bg-white">
       <Toaster richColors />
       <LandingNav />
-      <main className="flex-1">
-        <LandingHero />
-        <LandingFeatures />
-        <LandingAnnouncements />
-      </main>
+      <CampusScroll />
+      <LandingFeatures />
       <LandingFooter />
     </div>
   );
