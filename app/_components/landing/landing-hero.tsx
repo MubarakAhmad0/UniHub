@@ -1,8 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { LoginModal } from "./login-modal";
 import {
   GraduationCap,
   Map as MapIcon,
@@ -48,14 +48,14 @@ export function LandingHero() {
             </p>
 
             <div className="flex flex-wrap items-center gap-4 mt-4">
-              <LoginModal>
+              <Link href="/login">
                 <Button
                   size="lg"
                   className="h-12 rounded-full bg-[#FF8157] text-white hover:bg-[#E6744E] px-8 text-base shadow-sm hover:shadow-md transition-all"
                 >
                   Student Login
                 </Button>
-              </LoginModal>
+              </Link>
               <Button
                 size="lg"
                 variant="outline"

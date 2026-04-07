@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { LoginModal } from "./login-modal";
 import { GraduationCap } from "lucide-react";
 
 export function LandingNav() {
@@ -44,11 +43,11 @@ export function LandingNav() {
             >
               Request Demo
             </Button>
-            <LoginModal>
+            <Link href="/login">
               <Button className="rounded-full bg-[#FF8157] text-white hover:bg-[#E6744E] shadow-sm hover:shadow-md transition-all">
                 Student Login
               </Button>
-            </LoginModal>
+            </Link>
           </div>
         </div>
       </div>
