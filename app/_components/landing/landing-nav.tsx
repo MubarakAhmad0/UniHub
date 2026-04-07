@@ -1,8 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { GraduationCap } from "lucide-react";
 
 export function LandingNav() {
   return (
@@ -13,8 +13,14 @@ export function LandingNav() {
             href="/"
             className="flex items-center gap-2 transition-opacity hover:opacity-80"
           >
-            <div className="rounded-md bg-primary p-1.5 text-primary-foreground">
-              <GraduationCap className="h-5 w-5" />
+            <div>
+              <Image
+                src="/favicon.ico"
+                alt="UniHub Logo"
+                width={32}
+                height={32}
+                className="rounded-md"
+              />
             </div>
             <span className="font-[family-name:var(--font-sans)] text-lg font-bold tracking-tight">
               UniHub

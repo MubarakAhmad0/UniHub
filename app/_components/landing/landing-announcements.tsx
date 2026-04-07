@@ -31,7 +31,7 @@ export function LandingAnnouncements() {
           <div className="flex-1 space-y-6">
             <h2 className="font-[family-name:var(--font-serif)] text-3xl font-medium tracking-tight text-foreground sm:text-4xl md:text-5xl">
               Live Announcements & <br />
-              <span className="italic text-[#8c7164]">Scholar Slate</span>
+              <span className="italic text-primary/80">Scholar Slate</span>
             </h2>
             <div className="h-1 w-12 bg-[#FF8157] rounded-full"></div>
             <p className="text-lg text-muted-foreground leading-relaxed max-w-lg">
@@ -83,7 +83,7 @@ export function LandingAnnouncements() {
                   >
                     {/* Timeline dot */}
                     <div className="absolute left-0 top-1.5 h-6 w-6 rounded-full border-[3px] border-background bg-primary shadow-sm flex items-center justify-center">
-                      <div className="h-1.5 w-1.5 rounded-full bg-white"></div>
+                      <div className="h-1.5 w-1.5 rounded-full bg-foreground"></div>
                     </div>
 
                     <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1 flex items-center justify-between">

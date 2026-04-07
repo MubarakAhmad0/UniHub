@@ -154,28 +154,31 @@ const TYPE_CONFIG: Record<
   system: {
     label: "System",
     borderColor: "border-l-rose-400",
-    bgColor: "bg-rose-50/60",
-    iconBg: "bg-rose-100",
-    textColor: "text-rose-600",
-    badgeClass: "bg-rose-100 text-rose-700",
+    bgColor: "bg-rose-50/60 dark:bg-rose-950/30",
+    iconBg: "bg-rose-100 dark:bg-rose-900/50",
+    textColor: "text-rose-600 dark:text-rose-400",
+    badgeClass:
+      "bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-300",
     emoji: "🔧",
   },
   faculty: {
     label: "Faculty",
     borderColor: "border-l-blue-400",
-    bgColor: "bg-blue-50/60",
-    iconBg: "bg-blue-100",
-    textColor: "text-blue-600",
-    badgeClass: "bg-blue-100 text-blue-700",
+    bgColor: "bg-blue-50/60 dark:bg-blue-950/30",
+    iconBg: "bg-blue-100 dark:bg-blue-900/50",
+    textColor: "text-blue-600 dark:text-blue-400",
+    badgeClass:
+      "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300",
     emoji: "👩‍🏫",
   },
   event: {
     label: "Event",
     borderColor: "border-l-emerald-400",
-    bgColor: "bg-emerald-50/60",
-    iconBg: "bg-emerald-100",
-    textColor: "text-emerald-600",
-    badgeClass: "bg-emerald-100 text-emerald-700",
+    bgColor: "bg-emerald-50/60 dark:bg-emerald-950/30",
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/50",
+    textColor: "text-emerald-600 dark:text-emerald-400",
+    badgeClass:
+      "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300",
     emoji: "🎉",
   },
 };
@@ -244,10 +247,10 @@ export default function AnnouncementsPage() {
       <div
         className={`
           relative rounded-xl border-l-4 ${cfg.borderColor}
-          bg-white shadow-[0_2px_16px_rgba(42,52,57,0.06)]
+          bg-card shadow-sm
           transition-all duration-200
           ${isRead ? "opacity-70" : ""}
-          hover:shadow-[0_4px_24px_rgba(42,52,57,0.10)]
+          hover:shadow-md
           cursor-pointer
         `}
         onClick={() => toggleExpand(item.id)}
@@ -288,7 +291,7 @@ export default function AnnouncementsPage() {
                 className={`text-sm leading-snug ${isRead ? "font-normal text-muted-foreground" : "font-semibold text-foreground"}`}
               >
                 {!isRead && (
-                  <span className="inline-block h-2 w-2 rounded-full bg-blue-500 mr-2 mb-0.5 animate-pulse" />
+                  <span className="inline-block h-2 w-2 rounded-full bg-blue-500 dark:bg-blue-400 mr-2 mb-0.5 animate-pulse" />
                 )}
                 {item.title}
               </h3>
@@ -328,7 +331,7 @@ export default function AnnouncementsPage() {
               <Button
                 size="icon"
                 variant={isRead ? "outline" : "ghost"}
-                className={`h-7 w-7 shrink-0 transition-colors ${isRead ? "text-muted-foreground" : "text-blue-500 hover:text-blue-600"}`}
+                className={`h-7 w-7 shrink-0 transition-colors ${isRead ? "text-muted-foreground" : "text-blue-500 dark:text-blue-400 hover:text-blue-600"}`}
                 onClick={() => toggleRead(item.id)}
                 id={`read-toggle-${item.id}`}
                 title={isRead ? "Mark as unread" : "Mark as read"}
@@ -345,7 +348,7 @@ export default function AnnouncementsPage() {
   /* ── Render ─────────────────────────────────────────────────────── */
 
   return (
-    <div className="flex flex-col min-h-svh bg-[#f7f9fb]">
+    <div className="flex flex-col min-h-svh bg-background">
       {/* ── Top bar ────────────────────────────────────────────────── */}
       <header className="flex h-14 shrink-0 items-center gap-2 border-b bg-background/80 backdrop-blur-sm px-4 sticky top-0 z-10">
         <SidebarTrigger className="-ml-1" />
@@ -387,7 +390,7 @@ export default function AnnouncementsPage() {
             <div className="relative">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                className="pl-9 w-56 bg-white border-0 shadow-[0_1px_4px_rgba(0,0,0,0.08)] focus-visible:ring-1"
+                className="pl-9 w-56 bg-background shadow-sm focus-visible:ring-1"
                 placeholder="Search announcements…"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -398,7 +401,7 @@ export default function AnnouncementsPage() {
               <Button
                 variant="outline"
                 size="sm"
-                className="text-xs gap-1.5 bg-white border-0 shadow-[0_1px_4px_rgba(0,0,0,0.08)]"
+                className="text-xs gap-1.5 bg-background shadow-sm"
                 onClick={markAllRead}
                 id="mark-all-read"
               >
@@ -411,9 +414,9 @@ export default function AnnouncementsPage() {
 
         {/* ── Priority alert banner ────────────────────────────────── */}
         {!alertDismissed && highPriorityUnread.length > 0 && (
-          <div className="flex items-center gap-3 rounded-xl bg-amber-50 border border-amber-200/60 px-4 py-3 text-sm">
-            <Bell className="h-4 w-4 text-amber-600 shrink-0" />
-            <p className="flex-1 text-amber-800 font-medium">
+          <div className="flex items-center gap-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40 px-4 py-3 text-sm">
+            <Bell className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
+            <p className="flex-1 text-amber-800 dark:text-amber-300 font-medium">
               You have{" "}
               <span className="font-bold">{highPriorityUnread.length}</span>{" "}
               high-priority{" "}
@@ -424,7 +427,7 @@ export default function AnnouncementsPage() {
             </p>
             <button
               onClick={() => setAlertDismissed(true)}
-              className="text-amber-500 hover:text-amber-700 transition-colors"
+              className="text-amber-500 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
               id="dismiss-alert"
               aria-label="Dismiss alert"
             >
@@ -453,10 +456,10 @@ export default function AnnouncementsPage() {
                   <div
                     key={item.id}
                     className={`
-                    relative rounded-xl border-l-4 border-l-amber-400
-                    bg-amber-50/50 shadow-[0_2px_16px_rgba(42,52,57,0.06)]
+                    relative rounded-xl border-l-4 border-l-amber-400 dark:border-l-amber-500
+                    bg-amber-50/50 dark:bg-amber-950/20 shadow-sm
                     transition-all duration-200
-                    hover:shadow-[0_4px_24px_rgba(42,52,57,0.10)]
+                    hover:shadow-md
                     cursor-pointer
                   `}
                     onClick={() => toggleExpand(item.id)}
@@ -475,7 +478,7 @@ export default function AnnouncementsPage() {
                           >
                             {TYPE_CONFIG[item.type].label}
                           </span>
-                          <span className="text-[10px] font-semibold uppercase tracking-widest px-2 py-0.5 rounded bg-amber-200 text-amber-800">
+                          <span className="text-[10px] font-semibold uppercase tracking-widest px-2 py-0.5 rounded bg-amber-200 dark:bg-amber-800 text-amber-800 dark:text-amber-200">
                             Pinned
                           </span>
                           {item.priority === "high" && (
@@ -491,7 +494,7 @@ export default function AnnouncementsPage() {
                           className={`text-sm leading-snug ${item.read ? "font-normal text-muted-foreground" : "font-semibold text-foreground"}`}
                         >
                           {!item.read && (
-                            <span className="inline-block h-2 w-2 rounded-full bg-blue-500 mr-2 mb-0.5 animate-pulse" />
+                            <span className="inline-block h-2 w-2 rounded-full bg-blue-500 dark:bg-blue-400 mr-2 mb-0.5 animate-pulse" />
                           )}
                           {item.title}
                         </h3>
@@ -523,7 +526,7 @@ export default function AnnouncementsPage() {
                           <Button
                             size="icon"
                             variant={item.read ? "outline" : "ghost"}
-                            className={`h-7 w-7 shrink-0 transition-colors ${item.read ? "text-muted-foreground" : "text-blue-500"}`}
+                            className={`h-7 w-7 shrink-0 transition-colors ${item.read ? "text-muted-foreground" : "text-blue-500 dark:text-blue-400"}`}
                             onClick={() => toggleRead(item.id)}
                             id={`pinned-read-toggle-${item.id}`}
                             title={
@@ -558,7 +561,7 @@ export default function AnnouncementsPage() {
                 className={`text-xs px-4 py-1.5 rounded-full font-medium transition-all ${
                   activeFilter === key
                     ? "bg-primary text-primary-foreground shadow-sm"
-                    : "bg-white text-muted-foreground hover:bg-white/80 shadow-[0_1px_4px_rgba(0,0,0,0.08)]"
+                    : "bg-card text-muted-foreground hover:bg-muted/80 shadow-sm"
                 }`}
                 id={`filter-${key}`}
               >

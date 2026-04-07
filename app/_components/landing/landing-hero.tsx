@@ -65,7 +65,7 @@ export function LandingHero() {
               </Button>
             </div>
 
-            <div className="flex items-center gap-4 mt-8 text-sm text-muted-foreground">
+            {/* <div className="flex items-center gap-4 mt-8 text-sm text-muted-foreground">
               <div className="flex -space-x-2">
                 {[1, 2, 3, 4].map((i) => (
                   <div
@@ -80,7 +80,7 @@ export function LandingHero() {
                 Trusted by over{" "}
                 <strong className="text-foreground">10,000+</strong> students
               </p>
-            </div>
+            </div> */}
           </motion.div>
 
           {/* Abstract Dashboard Mockup */}

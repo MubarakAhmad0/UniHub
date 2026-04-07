@@ -20,10 +20,10 @@ export default async function Login() {
         <div className="flex justify-center gap-2 md:justify-start">
           <Link href="/" className="flex items-center gap-2 font-medium">
             <Image
-              src="/placeholder-icon.jpg"
-              alt="Placeholder Logo"
-              width={24}
-              height={24}
+              src="/favicon.ico"
+              alt="UniHub Logo"
+              width={32}
+              height={32}
               className="rounded-md"
             />
             UniHub
@@ -59,9 +59,9 @@ export default async function Login() {
       </div>
       <div className="bg-muted relative hidden lg:block">
         <Image
-          src="/login.jpg"
-          alt="Image"
-          className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.5]"
+          src="/login.png"
+          alt="UniHub Student Portal"
+          className="absolute inset-0 w-full object-contain dark:brightness-[0.5]"
           width={1920}
           height={1080}
           quality={100}
