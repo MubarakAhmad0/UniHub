@@ -80,7 +80,7 @@ export const changeUserPassword = async (input: {
           accountId: existing.id.toString(),
           userId: existing.id,
           password: hashedPassword,
-          providerId: "credentials",
+          providerId: "credential",
         })
         .returning();
 

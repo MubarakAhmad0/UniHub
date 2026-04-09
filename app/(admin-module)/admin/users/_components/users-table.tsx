@@ -4,10 +4,9 @@ import { DataTable } from "@/components/data-table/data-table";
 import { DataTableToolbar } from "@/components/data-table/data-table-toolbar";
 import { useDataTable } from "@/hooks/use-data-table";
 import type { DataTableFilterField, DataTableRowAction } from "@/types";
-import { useRouter } from "next/navigation";
-import { use, useEffect, useMemo, useState } from "react";
+import { use, useMemo, useState } from "react";
 import { getRoles } from "../../roles/_lib/actions";
-import { getBranches, getDepartments, getUsers } from "../_lib/actions";
+import { getDepartments, getUsers } from "../_lib/actions";
 import { DeleteUsersDialog } from "./delete-users-dialog";
 import UpdateUserSheet from "./update-user-sheet";
 import { UserDialog } from "./user-dialog";
@@ -20,27 +19,17 @@ export interface UsersTableProps {
   promises: Promise<{
     users: Awaited<ReturnType<typeof getUsers>>;
     departments: Awaited<ReturnType<typeof getDepartments>>;
-    branches: Awaited<ReturnType<typeof getBranches>>;
     roles: Awaited<ReturnType<typeof getRoles>>;
   }>;
 }
 
 export default function UsersTable({ promises }: UsersTableProps) {
-  const router = useRouter();
-
-  const { users, departments, branches, roles } = use(promises);
+  const { users, departments, roles } = use(promises);
   const { data, pageCount } = users;
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [rowAction, setRowAction] =
     useState<DataTableRowAction<UserRow> | null>(null);
-
-  useEffect(() => {
-    if (rowAction?.type === "view") {
-      router.push(`/admin/users/${rowAction.row.original?.id}`);
-      setRowAction(null);
-    }
-  }, [rowAction, router]);
 
   const columns = useMemo(() => getColumns({ setRowAction }), [setRowAction]);
 
@@ -98,7 +87,6 @@ export default function UsersTable({ promises }: UsersTableProps) {
       <UpdateUserSheet
         roles={roles}
         departments={departments}
-        branches={branches}
         open={rowAction?.type === "update"}
         onOpenChange={() => setRowAction(null)}
         data={rowAction?.row.original ?? null}
@@ -119,7 +107,6 @@ export default function UsersTable({ promises }: UsersTableProps) {
         onSuccess={() => {}}
         roles={roles}
         departments={departments}
-        branches={branches}
         open={isCreateDialogOpen}
         onOpenChange={setIsCreateDialogOpen}
       />

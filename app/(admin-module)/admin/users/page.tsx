@@ -1,5 +1,5 @@
 import { Layout, LayoutBody } from "@/components/ui/layout";
-import { getBranches, getDepartments, getUsers } from "./_lib/actions";
+import { getDepartments, getUsers } from "./_lib/actions";
 import { searchParamsCache } from "./_lib/validations";
 import UsersTable from "./_components/users-table";
 import { getValidFilters } from "@/lib/data-table";
@@ -15,17 +15,16 @@ export default async function UsersPage(props: UsersPageProps) {
   const search = searchParamsCache.parse(searchParams);
   const validFilters = getValidFilters(search.filters);
 
-  const [users, departments, branches, roles] = await Promise.all([
+  const [users, departments, roles] = await Promise.all([
     getUsers({
       ...search,
       filters: validFilters,
     }),
     getDepartments(),
-    getBranches(),
     getRoles(),
   ]);
 
-  const promises = Promise.resolve({ users, departments, branches, roles });
+  const promises = Promise.resolve({ users, departments, roles });
 
   return (
     <Layout>

@@ -29,13 +29,14 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
-import { Branch, Department } from "@/db/schema";
+import { departments } from "@/db/schema";
 import { Role } from "@/db/schema/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
 import React, { useEffect, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import type { InferSelectModel } from "drizzle-orm";
 import {
   createUserAccount,
   getUserAccounts,
@@ -44,18 +45,18 @@ import {
 import { UserFormData, userFormSchema } from "../_lib/validations";
 import { UserRow } from "./users-table-columns";
 
+type Department = InferSelectModel<typeof departments>;
+
 type UpdateUserSheetProps = React.ComponentPropsWithRef<typeof Sheet> & {
   data: UserRow | null;
   roles: Role[];
   departments: Department[];
-  branches: Branch[];
 };
 
 export default function UpdateUserSheet({
   data,
   roles,
   departments,
-  branches,
   ...props
 }: UpdateUserSheetProps) {
   const [isPending, startTransition] = useTransition();
@@ -72,11 +73,8 @@ export default function UpdateUserSheet({
       phoneNumber: data?.phoneNumber ?? "",
       jobTitle: data?.jobTitle ?? "",
       roleIds: data?.roles?.map((role) => role.id) ?? [],
-      employeeId: data?.employeeId ?? "",
       departmentId: data?.departmentId ?? 0,
-      branchId: data?.branchId ?? 0,
       isActive: data?.isActive ?? false,
-      oldId: data?.oldId ?? undefined,
     },
   });
 
@@ -150,11 +148,8 @@ export default function UpdateUserSheet({
         phoneNumber: data.phoneNumber ?? "",
         jobTitle: data.jobTitle ?? "",
         roleIds: data.roles?.map((role) => role.id) ?? [],
-        employeeId: data.employeeId ?? "",
         departmentId: data.departmentId ?? 0,
-        branchId: data.branchId ?? 0,
         isActive: data.isActive ?? false,
-        oldId: data.oldId ?? 0,
       });
 
       fetchAccounts();
@@ -254,19 +249,6 @@ export default function UpdateUserSheet({
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={form.control}
-                    name="employeeId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Employee ID</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Enter employee ID" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
                 </div>
 
                 <div className="grid grid-cols-1 gap-4">
@@ -351,58 +333,9 @@ export default function UpdateUserSheet({
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={form.control}
-                    name="branchId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Branch</FormLabel>
-                        <Select
-                          value={field.value?.toString()}
-                          onValueChange={(value) =>
-                            field.onChange(Number(value))
-                          }
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a branch" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {branches.map((branch) => (
-                              <SelectItem
-                                key={branch.id}
-                                value={branch.id.toString()}
-                              >
-                                {branch.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
-                  <FormField
-                    control={form.control}
-                    name="oldId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Old ID</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            placeholder="Enter Old ID"
-                            type="number"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
                   <FormField
                     control={form.control}
                     name="isActive"

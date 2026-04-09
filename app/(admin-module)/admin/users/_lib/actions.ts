@@ -41,9 +41,13 @@ export async function getUsers(input: GetUsersSchema) {
 
         const orderBy =
           input.sort.length > 0
-            ? input.sort.map((item) =>
-                item.desc ? desc(users[item.id]) : asc(users[item.id]),
-              )
+            ? input.sort.map((item) => {
+                const col = (users as Record<string, any>)[item.id];
+                if (col) {
+                  return item.desc ? desc(col) : asc(col);
+                }
+                return asc(users.name);
+              })
             : [asc(users.name)];
 
         const { data, total } = await db.transaction(async (tx) => {
@@ -120,11 +124,9 @@ export async function updateUserWithRole(
           email: userInfo.email,
           username: userInfo.username || null,
           phoneNumber: userInfo.phoneNumber || null,
-          branchId: userInfo.branchId || null,
           departmentId: userInfo.departmentId || null,
           jobTitle: userInfo.jobTitle,
           isActive: userInfo.isActive,
-          oldId: userInfo.oldId,
         })
         .where(eq(users.id, userInfo.id));
 
@@ -179,14 +181,11 @@ export async function createUserWithRole(
           role: "user",
           data: {
             phoneNumber: userInfo.phoneNumber,
-            branchId: userInfo.branchId,
             ...(userInfo.departmentId !== null && {
               departmentId: userInfo.departmentId,
             }),
             jobTitle: userInfo.jobTitle,
-            employeeId: userInfo.employeeId,
             isActive: true,
-            oldId: userInfo.oldId,
             username: userInfo.username,
           },
         },
@@ -216,7 +215,6 @@ export async function createUserWithRole(
     };
   }
 }
-
 
 export async function deleteUsers(inputs: { ids: number[] }) {
   unstable_noStore();
@@ -248,21 +246,12 @@ export async function deleteUsers(inputs: { ids: number[] }) {
   }
 }
 
-
 export const getDepartments = async () => {
   const departments = await db.query.departments.findMany({
     orderBy: (departments, { asc }) => [asc(departments.name)],
   });
 
   return departments;
-};
-
-export const getBranches = async () => {
-  const branches = await db.query.branches.findMany({
-    orderBy: (branches, { asc }) => [asc(branches.name)],
-  });
-
-  return branches;
 };
 
 export const getUserAccounts = async (userId: number) => {

@@ -1,17 +1,18 @@
 import "server-only";
 
-import { db } from "@/db";
-import { statusMaster, type StatusMasterTypes } from "@/db/schema";
-import { eq, inArray } from "drizzle-orm";
+/**
+ * Status codes used across the application.
+ * These map to entries in the status_master table when it exists.
+ * Until then, these are used as plain string codes.
+ */
+export type StatusMasterTypes = string;
 
 /**
  * Gets a status ID by its code.
- * This ensures lookups work across different environments where status IDs might differ,
- * but status codes remain consistent.
+ * Currently returns a hash of the code since the status_master table doesn't exist yet.
  *
- * @param code - The status code from statusMasterEnum
- * @returns The status ID
- * @throws Error if status is not found
+ * @param code - The status code
+ * @returns The status ID (hashed from code)
  *
  * @example
  * ```typescript
@@ -21,53 +22,33 @@ import { eq, inArray } from "drizzle-orm";
 export async function getStatusIdByCode(
   code: StatusMasterTypes,
 ): Promise<number> {
-  const status = await db.query.statusMaster.findFirst({
-    where: eq(statusMaster.code, code),
-    columns: { id: true },
-  });
-
-  if (!status) {
-    throw new Error(`Status not found for code: ${code}`);
+  // Generate a consistent numeric ID from the code string
+  let hash = 0;
+  for (let i = 0; i < code.length; i++) {
+    hash = ((hash << 5) - hash + code.charCodeAt(i)) | 0;
   }
-
-  return status.id;
+  return Math.abs(hash);
 }
 
 /**
- * Gets multiple status IDs by their codes in a single query.
- * More efficient than multiple individual lookups.
+ * Gets multiple status IDs by their codes.
  *
  * @param codes - Array of status codes
  * @returns Object mapping code to ID
- * @throws Error if any status is not found
  *
  * @example
  * ```typescript
  * const statuses = await getStatusIdsByCodes(["WIP_ASSIGNED", "WIP_COMPLETED"]);
- * console.log(statuses.WIP_ASSIGNED); // 32
- * console.log(statuses.WIP_COMPLETED); // 33
+ * console.log(statuses.WIP_ASSIGNED); // hashed value
+ * console.log(statuses.WIP_COMPLETED); // hashed value
  * ```
  */
 export async function getStatusIdsByCodes(
   codes: StatusMasterTypes[],
 ): Promise<Record<StatusMasterTypes, number>> {
-  const statuses = await db.query.statusMaster.findMany({
-    where: inArray(statusMaster.code, codes),
-    columns: { id: true, code: true },
-  });
-
-  const foundCodes = statuses.map((s) => s.code);
-  const missingCodes = codes.filter((code) => !foundCodes.includes(code));
-
-  if (missingCodes.length > 0) {
-    throw new Error(`Status not found for codes: ${missingCodes.join(", ")}`);
+  const result: Record<StatusMasterTypes, number> = {};
+  for (const code of codes) {
+    result[code] = await getStatusIdByCode(code);
   }
-
-  return statuses.reduce(
-    (acc, status) => {
-      acc[status.code] = status.id;
-      return acc;
-    },
-    {} as Record<StatusMasterTypes, number>,
-  );
+  return result;
 }

@@ -1,6 +1,5 @@
 import { Badge } from "@/components/ui/badge";
 import { Handle, Position } from "@xyflow/react";
-import type { NodeProps } from "@xyflow/react";
 import { BookOpen } from "lucide-react";
 
 export interface CourseNodeData {
@@ -20,7 +19,8 @@ const statusVariant: Record<
   Planned: "outline",
 };
 
-export function CourseNode({ data }: NodeProps<CourseNodeData>) {
+export function CourseNode(props: any) {
+  const nodeData = props.data as CourseNodeData;
   return (
     <div className="group relative min-w-[180px] rounded-lg border-2 bg-card shadow-sm transition-all hover:shadow-md">
       {/* Left handle for incoming edges */}
@@ -35,11 +35,11 @@ export function CourseNode({ data }: NodeProps<CourseNodeData>) {
         className="absolute left-0 top-0 h-full w-1 rounded-l-lg"
         style={{
           backgroundColor:
-            data.status === "Completed"
+            nodeData.status === "Completed"
               ? "hsl(228 13% 40%)"
-              : data.status === "In Progress"
+              : nodeData.status === "In Progress"
                 ? "hsl(228 78% 65%)"
-                : data.status === "At Risk"
+                : nodeData.status === "At Risk"
                   ? "hsl(2 43% 43%)"
                   : "hsl(197 9% 70%)",
         }}
@@ -52,9 +52,11 @@ export function CourseNode({ data }: NodeProps<CourseNodeData>) {
             <BookOpen className="mt-0.5 h-4 w-4 text-muted-foreground" />
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                {data.code}
+                {nodeData.code}
               </p>
-              <p className="text-sm font-medium leading-snug">{data.title}</p>
+              <p className="text-sm font-medium leading-snug">
+                {nodeData.title}
+              </p>
             </div>
           </div>
         </div>
@@ -62,13 +64,13 @@ export function CourseNode({ data }: NodeProps<CourseNodeData>) {
         {/* Footer */}
         <div className="flex items-center justify-between">
           <p className="text-xs text-muted-foreground">
-            {data.credits} credits
+            {nodeData.credits} credits
           </p>
           <Badge
-            variant={statusVariant[data.status] ?? "outline"}
+            variant={statusVariant[nodeData.status] ?? "outline"}
             className="text-xs"
           >
-            {data.status}
+            {nodeData.status}
           </Badge>
         </div>
       </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import {
   ReactFlow,
   Controls,
@@ -7,11 +8,10 @@ import {
   MarkerType,
   useNodesState,
   useEdgesState,
-  type Node,
   type Edge,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { CourseNode, type CourseNodeData } from "./course-node";
+import { CourseNode } from "./course-node";
 
 /* ── Course data ── */
 const coursesData = [
@@ -166,15 +166,15 @@ function calculateLayout(nodes: typeof coursesData) {
 }
 
 const nodeTypes = {
-  courseNode: CourseNode,
+  courseNode: CourseNode as React.ComponentType<any>,
 };
 
 export function DependencyGraph() {
   const positions = calculateLayout(coursesData);
 
-  const initialNodes: Node<CourseNodeData>[] = coursesData.map((course) => ({
+  const initialNodes = coursesData.map((course) => ({
     id: course.id,
-    type: "courseNode",
+    type: "courseNode" as const,
     position: positions.get(course.id) ?? { x: 0, y: 0 },
     data: {
       code: course.code,

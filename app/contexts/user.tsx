@@ -16,12 +16,13 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode } from "react";
-import type { User } from "@/db/schema";
+import { users, departments } from "@/db/schema";
+import type { InferSelectModel } from "drizzle-orm";
 
-type StoredUser = Pick<
-  User,
-  "id" | "name" | "employeeId" | "departmentId" | "branchId"
->;
+type User = InferSelectModel<typeof users>;
+type Department = InferSelectModel<typeof departments>;
+
+type StoredUser = Pick<User, "id" | "name" | "departmentId">;
 
 interface UserContextType {
   user: StoredUser | null;

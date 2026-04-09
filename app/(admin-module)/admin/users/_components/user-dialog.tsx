@@ -26,14 +26,18 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FormDescription } from "@/components/ui/form";
-import { Branch, Department, User } from "@/db/schema";
+import { departments, users } from "@/db/schema";
 import { Role } from "@/db/schema/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import type { InferSelectModel } from "drizzle-orm";
 import { createUserWithRole } from "../_lib/actions";
 import { UserFormData, userFormSchema } from "../_lib/validations";
+
+type User = InferSelectModel<typeof users>;
+type Department = InferSelectModel<typeof departments>;
 
 interface UserDialogProps {
   user?: User | null;
@@ -42,7 +46,6 @@ interface UserDialogProps {
   onSuccess: (user: User) => void;
   roles: Role[];
   departments: Department[];
-  branches: Branch[];
 }
 
 export function UserDialog({
@@ -52,7 +55,6 @@ export function UserDialog({
   onSuccess,
   roles,
   departments,
-  branches,
 }: UserDialogProps) {
   const form = useForm<UserFormData>({
     resolver: zodResolver(userFormSchema.omit({ emailVerified: true })),
@@ -63,10 +65,7 @@ export function UserDialog({
       phoneNumber: "",
       jobTitle: "",
       roleIds: [],
-      employeeId: "",
       departmentId: undefined,
-      branchId: undefined,
-      oldId: 0,
       isActive: false,
     },
   });
@@ -186,20 +185,6 @@ export function UserDialog({
             />
             <FormField
               control={form.control}
-              name="oldId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Old Id</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Enter Old ID" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
               name="departmentId"
               render={({ field }) => (
                 <FormItem>
@@ -221,37 +206,6 @@ export function UserDialog({
                             value={department.id.toString()}
                           >
                             {department.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="branchId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Branch</FormLabel>
-                  <FormControl>
-                    <Select
-                      value={field?.value?.toString()}
-                      onValueChange={(value) => field.onChange(parseInt(value))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a branch" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {branches.map((branch) => (
-                          <SelectItem
-                            key={branch.id}
-                            value={branch.id.toString()}
-                          >
-                            {branch.name}
                           </SelectItem>
                         ))}
                       </SelectContent>

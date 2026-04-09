@@ -142,17 +142,6 @@ export function getColumns({
       enableHiding: true,
     },
     {
-      accessorKey: "oldId",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Old ID" />
-      ),
-      cell: ({ row }) => {
-        return <div>{row.original.oldId ?? "N/A"}</div>;
-      },
-      enableSorting: false,
-      enableHiding: true,
-    },
-    {
       accessorKey: "accounts",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Have Account" />

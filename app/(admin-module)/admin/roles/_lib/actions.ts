@@ -71,6 +71,7 @@ export async function updateRole(roleId: number, data: NewRole) {
     const [updatedRole] = await db
       .update(roles)
       .set({
+        name: data.name,
         key: data.key,
         description: data.description || null,
       })

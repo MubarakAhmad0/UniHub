@@ -1,4 +1,4 @@
-import { type User } from "@/db/schema";
+import { users, departments } from "@/db/schema";
 import {
   createSearchParamsCache,
   parseAsArrayOf,
@@ -9,6 +9,10 @@ import {
 import * as z from "zod";
 
 import { getFiltersStateParser, getSortingStateParser } from "@/lib/parsers";
+import type { InferSelectModel } from "drizzle-orm";
+
+export type User = InferSelectModel<typeof users>;
+export type Department = InferSelectModel<typeof departments>;
 
 export const searchParamsCache = createSearchParamsCache({
   flags: parseAsArrayOf(z.enum(["advancedTable", "floatingBar"])).withDefault(
@@ -36,16 +40,7 @@ export const updateUserSchema = z.object({
   phoneNumber: z.string().optional(),
   jobTitle: z.string().optional(),
   roleIds: z.array(z.number()).min(1, "At least one role is required"),
-  employeeId: z.string().optional(),
   departmentId: z.number().optional(),
-  branchId: z.number().min(1, "Branch is required"),
-  oldId: z
-    .union([z.string(), z.number()])
-    .transform((val) => {
-      if (val === "" || val === undefined || val === null) return undefined;
-      return typeof val === "string" ? parseInt(val, 10) : val;
-    })
-    .optional(),
   isActive: z.boolean(),
   emailVerified: z.boolean(),
   image: z.string().optional(),
@@ -61,16 +56,7 @@ export const updateUserSchemaLegacy = z.object({
   phoneNumber: z.string().optional(),
   jobTitle: z.string().optional(),
   roleId: z.number().min(1, "Role is required"),
-  employeeId: z.string().optional(),
   departmentId: z.number().optional(),
-  branchId: z.number().min(1, "Branch is required"),
-  oldId: z
-    .union([z.string(), z.number()])
-    .transform((val) => {
-      if (val === "" || val === undefined || val === null) return undefined;
-      return typeof val === "string" ? parseInt(val, 10) : val;
-    })
-    .optional(),
   isActive: z.boolean(),
   emailVerified: z.boolean(),
   image: z.string().optional(),

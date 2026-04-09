@@ -115,7 +115,6 @@ export async function userDataCached(userId: number) {
       const userData = await db.query.users.findFirst({
         where: (users, { eq }) => eq(users.id, userId),
         with: {
-          branch: true,
           department: true,
         },
       });

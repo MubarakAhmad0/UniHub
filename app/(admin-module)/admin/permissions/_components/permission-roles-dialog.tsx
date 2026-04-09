@@ -24,6 +24,7 @@ interface PermissionRolesDialogProps {
   permission: Permission | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
 }
 
 type RoleItem = {
@@ -36,6 +37,7 @@ export function PermissionRolesDialog({
   permission,
   open,
   onOpenChange,
+  onSuccess,
 }: PermissionRolesDialogProps) {
   const [allRoles, setAllRoles] = useState<RoleItem[]>([]);
   const [selectedRoles, setSelectedRoles] = useState<Set<number>>(new Set());
@@ -97,6 +99,7 @@ export function PermissionRolesDialog({
       if (result.success) {
         toast.success("Roles updated successfully");
         onOpenChange(false);
+        onSuccess?.();
       } else {
         toast.error(result.error || "Failed to update roles");
       }

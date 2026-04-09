@@ -121,6 +121,7 @@ export function PermissionsTable({ data }: PermissionsTableProps) {
         }
         open={rowAction?.type === "update"}
         onOpenChange={(open) => !open && setRowAction(null)}
+        onSuccess={() => setRowAction(null)}
       />
 
       <DeletePermissionsDialog
