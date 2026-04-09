@@ -51,9 +51,19 @@ type Club = {
   joinMethod: JoinMethod;
   isActive: boolean;
   upcomingEvents: { title: string; date: string }[];
-  emoji: string;
+  image: string;
   memberStatus: MemberStatus;
   isAdvising?: boolean;
+};
+
+const CAT_IMAGE: Record<string, string> = {
+  Arts: "/uni images/pexels-davegarcia-31039030.jpg",
+  Sports: "/uni images/pexels-an-vuong-462540819-19554793.jpg",
+  Academic: "/uni images/pexels-rednguyen-22039132.jpg",
+  Cultural: "/uni images/pexels-clement-proust-363898785-24304639.jpg",
+  Tech: "/uni images/pexels-davegarcia-31039051.jpg",
+  Religious: "/uni images/pexels-shox-31656148.jpg",
+  Volunteer: "/uni images/pexels-george-pak-7972556.jpg",
 };
 
 const CATEGORIES = [
@@ -89,7 +99,7 @@ const clubs: Club[] = [
     members: 84,
     joinMethod: "open",
     isActive: true,
-    emoji: "📸",
+    image: CAT_IMAGE.Arts,
     memberStatus: "none",
     isAdvising: true,
     upcomingEvents: [
@@ -108,7 +118,7 @@ const clubs: Club[] = [
     members: 120,
     joinMethod: "open",
     isActive: true,
-    emoji: "🤖",
+    image: CAT_IMAGE.Tech,
     memberStatus: "member",
     upcomingEvents: [
       { title: "ML Workshop Series #3", date: "Tue Apr 8 · Lab 4" },
@@ -125,7 +135,7 @@ const clubs: Club[] = [
     members: 200,
     joinMethod: "open",
     isActive: true,
-    emoji: "🏀",
+    image: CAT_IMAGE.Sports,
     memberStatus: "none",
     upcomingEvents: [
       { title: "Intercollege Cup", date: "Sat Apr 12 · Sports Complex" },
@@ -142,7 +152,7 @@ const clubs: Club[] = [
     members: 56,
     joinMethod: "application",
     isActive: true,
-    emoji: "📐",
+    image: CAT_IMAGE.Academic,
     memberStatus: "pending",
     upcomingEvents: [
       { title: "Peer Critique Night", date: "Thu Apr 10 · Studio C" },
@@ -159,7 +169,7 @@ const clubs: Club[] = [
     members: 73,
     joinMethod: "open",
     isActive: true,
-    emoji: "🎭",
+    image: CAT_IMAGE.Cultural,
     memberStatus: "none",
     upcomingEvents: [
       {
@@ -179,7 +189,7 @@ const clubs: Club[] = [
     members: 145,
     joinMethod: "open",
     isActive: true,
-    emoji: "🤝",
+    image: CAT_IMAGE.Volunteer,
     memberStatus: "none",
     upcomingEvents: [{ title: "Clean Campus Drive", date: "Sun Apr 13 · 8am" }],
   },
@@ -361,10 +371,13 @@ export default function ClubsPage() {
                   onClick={() => setSelectedClub(club)}
                 >
                   {/* Banner */}
-                  <div
-                    className={`h-20 bg-gradient-to-br ${CAT_GRADIENT[club.category] ?? "from-muted to-muted/50"} flex items-center justify-center relative`}
-                  >
-                    <span className="text-4xl">{club.emoji}</span>
+                  <div className="h-20 relative overflow-hidden">
+                    <img
+                      src={club.image || CAT_IMAGE[club.category]}
+                      alt={club.name}
+                      className="object-cover w-full h-full"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-br from-black/10 to-black/5" />
                     <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-card" />
                   </div>
                   <CardHeader className="pb-2 pt-3 px-4">
@@ -421,10 +434,12 @@ export default function ClubsPage() {
                   className="border-0 shadow-sm bg-card overflow-hidden cursor-pointer hover:shadow transition-shadow"
                   onClick={() => setSelectedClub(club)}
                 >
-                  <div
-                    className={`h-16 bg-gradient-to-br ${CAT_GRADIENT[club.category]} flex items-center justify-center`}
-                  >
-                    <span className="text-3xl">{club.emoji}</span>
+                  <div className="h-16 relative overflow-hidden">
+                    <img
+                      src={club.image || CAT_IMAGE[club.category]}
+                      alt={club.name}
+                      className="object-cover w-full h-full"
+                    />
                   </div>
                   <CardContent className="px-4 py-3 flex items-center justify-between gap-3">
                     <div>
@@ -449,10 +464,12 @@ export default function ClubsPage() {
                     className="border-0 shadow-sm bg-card overflow-hidden cursor-pointer hover:shadow transition-shadow border-indigo-100"
                     onClick={() => setSelectedClub(club)}
                   >
-                    <div
-                      className={`h-16 bg-gradient-to-br ${CAT_GRADIENT[club.category]} flex items-center justify-center`}
-                    >
-                      <span className="text-3xl">{club.emoji}</span>
+                    <div className="h-16 relative overflow-hidden">
+                      <img
+                        src={club.image || CAT_IMAGE[club.category]}
+                        alt={club.name}
+                        className="object-cover w-full h-full"
+                      />
                     </div>
                     <CardContent className="px-4 py-3 flex flex-col gap-2">
                       <div className="flex justify-between items-start">
@@ -506,10 +523,12 @@ export default function ClubsPage() {
         <SheetContent className="sm:max-w-md overflow-y-auto">
           {selectedClub && (
             <>
-              <div
-                className={`h-28 bg-gradient-to-br ${CAT_GRADIENT[selectedClub.category]} flex items-center justify-center rounded-md mb-4`}
-              >
-                <span className="text-5xl">{selectedClub.emoji}</span>
+              <div className="h-28 rounded-md mb-4 overflow-hidden">
+                <img
+                  src={selectedClub.image || CAT_IMAGE[selectedClub.category]}
+                  alt={selectedClub.name}
+                  className="object-cover w-full h-full"
+                />
               </div>
               <SheetHeader>
                 <div className="flex items-center gap-2 mb-1">

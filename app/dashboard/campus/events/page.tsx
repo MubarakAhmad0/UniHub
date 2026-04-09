@@ -87,12 +87,12 @@ const CATEGORY_COLOR: Record<string, string> = {
   University: "bg-muted text-muted-foreground",
 };
 
-const CATEGORY_EMOJI: Record<string, string> = {
-  Sports: "🏆",
-  Cultural: "🎭",
-  Club: "🎨",
-  Career: "💼",
-  Academic: "📘",
+const CATEGORY_IMAGE: Record<string, string> = {
+  Sports: "/uni images/pexels-an-vuong-462540819-19554793.jpg",
+  Cultural: "/uni images/pexels-clement-proust-363898785-24304639.jpg",
+  Club: "/uni images/pexels-davegarcia-31039030.jpg",
+  Career: "/uni images/pexels-george-pak-7972556.jpg",
+  Academic: "/uni images/pexels-rednguyen-22039132.jpg",
 };
 
 /* ── Mock data ──────────────────────────────────────────────────────────────── */
@@ -666,10 +666,15 @@ export default function EventsPage() {
                 onClick={() => setDetailEvent(e)}
               >
                 <CardContent className="p-0 flex flex-col sm:flex-row">
-                  <div className="sm:w-48 h-32 sm:h-auto bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shrink-0">
-                    <span className="text-4xl">
-                      {CATEGORY_EMOJI[e.category] ?? "🎪"}
-                    </span>
+                  <div className="sm:w-48 h-32 sm:h-auto overflow-hidden shrink-0 relative">
+                    <img
+                      src={
+                        CATEGORY_IMAGE[e.category] ??
+                        "/uni images/pexels-davegarcia-31085770.jpg"
+                      }
+                      alt={e.category}
+                      className="object-cover w-full h-full"
+                    />
                   </div>
                   <div className="p-5 flex-1 space-y-2">
                     <div className="flex flex-wrap items-center gap-2 justify-between">
@@ -757,10 +762,15 @@ export default function EventsPage() {
                   className="border-0 shadow-sm bg-card cursor-pointer hover:shadow transition-shadow group"
                   onClick={() => setDetailEvent(e)}
                 >
-                  <div className="h-24 bg-gradient-to-br from-muted/60 to-muted/20 flex items-center justify-center rounded-t-md relative">
-                    <span className="text-3xl">
-                      {CATEGORY_EMOJI[e.category] ?? "📘"}
-                    </span>
+                  <div className="h-24 rounded-t-md relative overflow-hidden">
+                    <img
+                      src={
+                        CATEGORY_IMAGE[e.category] ??
+                        "/uni images/pexels-davegarcia-31085770.jpg"
+                      }
+                      alt={e.category}
+                      className="object-cover w-full h-full"
+                    />
                     {/* Admin quick controls */}
                     {isAdmin && (
                       <div
@@ -956,10 +966,15 @@ export default function EventsPage() {
         <SheetContent className="sm:max-w-md overflow-y-auto">
           {detailEvent && (
             <>
-              <div className="h-32 bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center rounded-md mb-4">
-                <span className="text-5xl">
-                  {CATEGORY_EMOJI[detailEvent.category] ?? "📘"}
-                </span>
+              <div className="h-32 rounded-md mb-4 overflow-hidden">
+                <img
+                  src={
+                    CATEGORY_IMAGE[detailEvent.category] ??
+                    "/uni images/pexels-davegarcia-31085770.jpg"
+                  }
+                  alt={detailEvent.category}
+                  className="object-cover w-full h-full"
+                />
               </div>
               <SheetHeader>
                 <div className="flex gap-2 flex-wrap mb-2 items-center justify-between">
