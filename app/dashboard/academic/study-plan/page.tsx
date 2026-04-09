@@ -25,6 +25,7 @@ import { useState } from "react";
 import { AdminStudyPlanAdditions } from "./_components/admin-additions";
 import { ADVISEES, AdviseeSelector } from "./_components/advisee-selector";
 import { AdvisorToolbar } from "./_components/advisor-toolbar";
+import { DependencyGraph } from "./_components/dependency-graph";
 import { EndorsementBanner } from "./_components/endorsement-banner";
 
 /* ── Static plan data ── */
@@ -138,29 +139,6 @@ const roadmapSemesters = [
   },
 ];
 
-const graphNodes = [
-  { id: "CS101", label: "CS 101", x: 60, y: 40, status: "Completed" },
-  { id: "MTH101", label: "MTH 101", x: 280, y: 40, status: "Completed" },
-  { id: "CS102", label: "CS 102", x: 60, y: 140, status: "Completed" },
-  { id: "MTH102", label: "MTH 102", x: 280, y: 140, status: "Completed" },
-  { id: "CS201", label: "CS 201", x: 60, y: 250, status: "Completed" },
-  { id: "MTH201", label: "MTH 201", x: 280, y: 250, status: "Completed" },
-  { id: "CS105", label: "CS 105", x: 60, y: 360, status: "At Risk" },
-  { id: "MTH301", label: "MTH 301", x: 280, y: 360, status: "In Progress" },
-  { id: "CS401", label: "CS 401", x: 170, y: 470, status: "Planned" },
-];
-
-const graphEdges = [
-  { from: "CS101", to: "CS102" },
-  { from: "MTH101", to: "MTH102" },
-  { from: "CS102", to: "CS201" },
-  { from: "MTH102", to: "MTH201" },
-  { from: "CS201", to: "CS105" },
-  { from: "MTH201", to: "MTH301" },
-  { from: "CS105", to: "CS401" },
-  { from: "MTH301", to: "CS401" },
-];
-
 const statusBadgeVariant: Record<
   string,
   "default" | "secondary" | "destructive" | "outline"
@@ -264,97 +242,31 @@ function StudyPlanContent({ readOnly = false }: { readOnly?: boolean }) {
 
         {/* Dependency Graph */}
         <TabsContent value="graph" className="mt-6">
-          <Card className="shadow-sm border-0 bg-card overflow-hidden">
-            <CardHeader className="pb-3">
+          <div className="space-y-4">
+            <div>
               <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 Course Dependencies
               </p>
               <p className="text-sm text-muted-foreground">
                 Visual map of prerequisite relationships between courses.
               </p>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-3 mb-6">
-                {Object.entries(statusColor).map(([label, color]) => (
-                  <div
-                    key={label}
-                    className="flex items-center gap-1.5 text-xs text-muted-foreground"
-                  >
-                    <span
-                      className="inline-block w-2.5 h-2.5 rounded-sm"
-                      style={{ backgroundColor: color }}
-                    />
-                    {label}
-                  </div>
-                ))}
-              </div>
-              <div className="overflow-x-auto">
-                <svg
-                  viewBox="0 0 480 560"
-                  className="w-full max-w-lg mx-auto"
-                  aria-label="Course dependency graph"
+            </div>
+            <div className="flex flex-wrap gap-3">
+              {Object.entries(statusColor).map(([label, color]) => (
+                <div
+                  key={label}
+                  className="flex items-center gap-1.5 text-xs text-muted-foreground"
                 >
-                  {graphEdges.map((edge) => {
-                    const from = graphNodes.find((n) => n.id === edge.from)!;
-                    const to = graphNodes.find((n) => n.id === edge.to)!;
-                    return (
-                      <line
-                        key={`${edge.from}-${edge.to}`}
-                        x1={from.x + 55}
-                        y1={from.y + 18}
-                        x2={to.x + 55}
-                        y2={to.y + 2}
-                        stroke="hsl(197 16% 73%)"
-                        strokeWidth="1.5"
-                        strokeDasharray="4 3"
-                      />
-                    );
-                  })}
-                  {graphNodes.map((node) => (
-                    <g
-                      key={node.id}
-                      transform={`translate(${node.x}, ${node.y})`}
-                    >
-                      <rect
-                        width="110"
-                        height="36"
-                        rx="4"
-                        fill={statusColor[node.status]}
-                        opacity="0.15"
-                        stroke={statusColor[node.status]}
-                        strokeWidth="1.5"
-                      />
-                      <rect
-                        width="4"
-                        height="36"
-                        rx="2"
-                        fill={statusColor[node.status]}
-                      />
-                      <text
-                        x="14"
-                        y="14"
-                        fontSize="10"
-                        fontWeight="600"
-                        fill="hsl(203 13% 20%)"
-                        fontFamily="Inter, system-ui, sans-serif"
-                      >
-                        {node.label}
-                      </text>
-                      <text
-                        x="14"
-                        y="27"
-                        fontSize="9"
-                        fill="hsl(197 9% 36%)"
-                        fontFamily="Inter, system-ui, sans-serif"
-                      >
-                        {node.status}
-                      </text>
-                    </g>
-                  ))}
-                </svg>
-              </div>
-            </CardContent>
-          </Card>
+                  <span
+                    className="inline-block w-2.5 h-2.5 rounded-sm"
+                    style={{ backgroundColor: color }}
+                  />
+                  {label}
+                </div>
+              ))}
+            </div>
+            <DependencyGraph />
+          </div>
         </TabsContent>
       </Tabs>
     </>

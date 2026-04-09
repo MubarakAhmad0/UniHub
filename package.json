@@ -64,6 +64,7 @@
     "@tanstack/react-virtual": "^3.11.2",
     "@types/nodemailer": "^6.4.17",
     "@typescript/native-preview": "7.0.0-dev.20250702.1",
+    "@xyflow/react": "^12.10.2",
     "babel-plugin-react-compiler": "19.1.0-rc.3",
     "better-auth": "^1.2.10",
     "ccundo": "^1.1.1",
