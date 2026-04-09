@@ -154,6 +154,12 @@
     --shadow-xl:  0px 24px 56px 0px hsl(0 0% 0% / 0.60), 0px 8px 16px -2px hsl(0 0% 0% / 0.45);
     --shadow-2xl: 0px 40px 80px 0px hsl(0 0% 0% / 1.00);
   }
+  .maplibregl-popup-content {
+    @apply bg-transparent! shadow-none! p-0! rounded-none!;
+  }
+  .maplibregl-popup-tip {
+    @apply hidden!;
+  }
 }
 
 @layer base {

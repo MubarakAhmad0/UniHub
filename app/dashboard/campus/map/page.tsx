@@ -12,6 +12,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import {
+  Map,
+  MapControls,
+  MapMarker,
+  MarkerContent,
+  MarkerPopup,
+  MarkerTooltip,
+} from "@/components/ui/map";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -34,6 +42,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/lib/auth/use-auth";
+import { cn } from "@/lib/utils";
 import { AlertTriangle, Pencil, Plus, Search, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -77,6 +86,8 @@ type Building = {
   rooms: Room[];
   underMaintenance?: boolean;
   isManagerOffice?: boolean;
+  /** Map coordinates */
+  coords: { lng: number; lat: number };
 };
 
 /* ── Mock data ── */
@@ -90,6 +101,7 @@ const INITIAL_BUILDINGS: Building[] = [
     category: "academic",
     floors: 6,
     hours: "07:00–22:00",
+    coords: { lng: 101.686, lat: 3.185 },
     rooms: [
       {
         code: "A4-101",
@@ -132,6 +144,7 @@ const INITIAL_BUILDINGS: Building[] = [
     category: "academic",
     floors: 4,
     hours: "07:00–22:00",
+    coords: { lng: 101.688, lat: 3.187 },
     rooms: [
       {
         code: "D1-101",
@@ -163,6 +176,7 @@ const INITIAL_BUILDINGS: Building[] = [
     category: "facilities",
     floors: 3,
     hours: "08:00–22:00",
+    coords: { lng: 101.69, lat: 3.184 },
     rooms: [
       {
         code: "LIB-201",
@@ -204,6 +218,7 @@ const INITIAL_BUILDINGS: Building[] = [
     category: "sports",
     floors: 2,
     hours: "07:00–22:00",
+    coords: { lng: 101.684, lat: 3.182 },
     rooms: [
       {
         code: "SC-101",
@@ -235,6 +250,7 @@ const INITIAL_BUILDINGS: Building[] = [
     category: "admin",
     floors: 5,
     hours: "08:30–17:30",
+    coords: { lng: 101.692, lat: 3.186 },
     rooms: [
       {
         code: "ADM-101",
@@ -267,6 +283,7 @@ const INITIAL_BUILDINGS: Building[] = [
     hours: "08:30–17:30",
     underMaintenance: false,
     isManagerOffice: true,
+    coords: { lng: 101.687, lat: 3.183 },
     rooms: [
       {
         code: "B2-203",
@@ -527,6 +544,12 @@ export default function CampusMapPage() {
     null,
   );
 
+  // Map viewport state
+  const [mapViewport, setMapViewport] = useState({
+    center: [101.688, 3.185] as [number, number],
+    zoom: 15,
+  });
+
   const filtered = buildings.filter((b) => {
     const matchCat =
       activeCategory === "All" || b.category === activeCategory.toLowerCase();
@@ -556,6 +579,7 @@ export default function CampusMapPage() {
           hours: data.hours ?? "08:00–18:00",
           rooms: [],
           underMaintenance: data.underMaintenance,
+          coords: data.coords ?? { lng: 101.688, lat: 3.185 },
         },
       ];
     });
@@ -784,12 +808,130 @@ export default function CampusMapPage() {
                 </div>
               )}
 
-              {/* Schematic placeholder */}
-              <Card className="border-0 shadow-sm">
-                <CardContent className="p-0 h-64 flex items-center justify-center bg-muted/20 rounded-md">
-                  <p className="text-sm text-muted-foreground">
-                    Interactive campus map — coming soon
-                  </p>
+              {/* Interactive campus map */}
+              <Card className="border-0 shadow-sm overflow-hidden">
+                <CardContent className="p-0">
+                  <div className="h-[500px] w-full">
+                    <Map
+                      viewport={mapViewport}
+                      onViewportChange={setMapViewport}
+                      className="rounded-md"
+                    >
+                      {/* Building markers */}
+                      {filtered.map((building) => (
+                        <MapMarker
+                          key={building.id}
+                          longitude={building.coords.lng}
+                          latitude={building.coords.lat}
+                          onClick={() => {
+                            if (editMode && isAdmin) {
+                              setMarkerFormFor(building);
+                            } else {
+                              setSelectedBuilding(building);
+                              setActiveFloor(1);
+                              setSelectedRoom(null);
+                            }
+                          }}
+                        >
+                          <MarkerContent
+                            className={cn(
+                              "transition-transform hover:scale-110",
+                              building.isManagerOffice &&
+                                isManager &&
+                                "scale-110",
+                            )}
+                          >
+                            <div
+                              className={cn(
+                                "relative flex items-center justify-center h-8 w-8 rounded-full border-2 border-white shadow-lg cursor-pointer",
+                                building.category === "academic" &&
+                                  "bg-blue-500",
+                                building.category === "admin" &&
+                                  "bg-purple-500",
+                                building.category === "facilities" &&
+                                  "bg-emerald-500",
+                                building.category === "sports" &&
+                                  "bg-orange-500",
+                                building.category === "residential" &&
+                                  "bg-pink-500",
+                                building.isManagerOffice &&
+                                  isManager &&
+                                  "ring-2 ring-amber-400",
+                              )}
+                            >
+                              <span className="text-white text-xs font-bold">
+                                {building.code}
+                              </span>
+                              {building.underMaintenance && (
+                                <span className="absolute -top-1 -right-1 h-4 w-4 bg-amber-500 rounded-full flex items-center justify-center border border-white">
+                                  <AlertTriangle className="h-2.5 w-2.5 text-white" />
+                                </span>
+                              )}
+                            </div>
+                          </MarkerContent>
+
+                          <MarkerTooltip>
+                            <div className="font-semibold">{building.name}</div>
+                            <div className="text-[10px] opacity-90 mt-0.5">
+                              {building.floors} floors · {building.hours}
+                            </div>
+                            {building.underMaintenance && (
+                              <div className="text-amber-600 text-[10px] mt-1 flex items-center gap-1">
+                                <AlertTriangle className="h-3 w-3" />
+                                Under Maintenance
+                              </div>
+                            )}
+                          </MarkerTooltip>
+
+                          <MarkerPopup closeButton>
+                            <div className="min-w-[200px]">
+                              <div className="flex items-start justify-between gap-2 mb-2">
+                                <div>
+                                  <p className="font-semibold text-sm">
+                                    {building.name}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {building.code} · {building.category}
+                                  </p>
+                                </div>
+                                {building.underMaintenance && (
+                                  <Badge
+                                    variant="outline"
+                                    className="text-amber-600 border-amber-400 text-[10px]"
+                                  >
+                                    <AlertTriangle className="h-3 w-3" />
+                                    Maintenance
+                                  </Badge>
+                                )}
+                              </div>
+                              <p className="text-xs text-muted-foreground mb-2">
+                                Open {building.hours}
+                              </p>
+                              <Button
+                                size="sm"
+                                className="w-full"
+                                onClick={() => {
+                                  setSelectedBuilding(building);
+                                  setActiveFloor(1);
+                                  setSelectedRoom(null);
+                                }}
+                              >
+                                View Rooms →
+                              </Button>
+                            </div>
+                          </MarkerPopup>
+                        </MapMarker>
+                      ))}
+
+                      {/* Map controls */}
+                      <MapControls
+                        showZoom
+                        showLocate
+                        showFullscreen
+                        position="bottom-right"
+                      />
+                    </Map>
+                  </div>
                 </CardContent>
               </Card>
 
