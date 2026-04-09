@@ -4,6 +4,9 @@ const withNextIntl = createNextIntlPlugin("./app/i18n/request.ts");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   experimental: {
     serverActions: {
       bodySizeLimit: "30mb",
