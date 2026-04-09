@@ -8,6 +8,8 @@ import { redirect } from "next/navigation";
 import { ReactNode } from "react";
 import { Toaster } from "sonner";
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardLayout({
   children,
 }: {

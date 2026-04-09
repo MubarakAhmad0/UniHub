@@ -6,6 +6,8 @@ import { getValidFilters } from "@/lib/data-table";
 import { SearchParams } from "@/types";
 import { getRoles } from "../roles/_lib/actions";
 
+export const dynamic = "force-dynamic";
+
 interface UsersPageProps {
   searchParams: Promise<SearchParams>;
 }

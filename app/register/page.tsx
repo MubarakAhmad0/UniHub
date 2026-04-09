@@ -3,6 +3,9 @@ import React from "react";
 import EmailSignUp from "./_components/email-sign-up";
 import { getRoles } from "../(admin-module)/admin/roles/_lib/actions";
 import Link from "next/link";
+
+export const dynamic = "force-dynamic";
+
 // import { auth } from "@/lib/auth";
 // import { headers } from "next/headers";
 // import { redirect } from "next/navigation";

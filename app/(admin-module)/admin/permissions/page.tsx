@@ -5,6 +5,8 @@ import { searchParamsCache } from "./_lib/validations";
 import { getValidFilters } from "@/lib/data-table";
 import { SearchParams } from "@/types";
 
+export const dynamic = "force-dynamic";
+
 interface PermissionsPageProps {
   searchParams: Promise<SearchParams>;
 }

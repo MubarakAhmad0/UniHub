@@ -9,7 +9,20 @@ class CustomLogger implements Logger {
   }
 }
 
-export const db = drizzle(process.env.DB_URL!, {
-  schema,
-  logger: process.env.DATABASE_LOGS === "true" ? new CustomLogger() : undefined,
-});
+const dbUrl = process.env.DB_URL;
+
+if (!dbUrl) {
+  console.warn(
+    "[DATABASE] DB_URL environment variable is not set. Database operations will fail at runtime.",
+  );
+}
+
+// Use a placeholder connection string if DB_URL is not set — queries will fail gracefully
+export const db = drizzle(
+  dbUrl || "postgresql://placeholder:placeholder@localhost:5432/placeholder",
+  {
+    schema,
+    logger:
+      process.env.DATABASE_LOGS === "true" ? new CustomLogger() : undefined,
+  },
+);
