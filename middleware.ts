@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
 
 export default async function authMiddleware(request: NextRequest) {
+  // Bypass auth for public access testing
+  if (process.env.ALLOW_PUBLIC_ACCESS === "true") {
+    return NextResponse.next();
+  }
+
   const sessionCookie = getSessionCookie(request);
 
   if (!sessionCookie) {
