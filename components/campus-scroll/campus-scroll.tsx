@@ -8,12 +8,12 @@ import { HeroOverlay } from "./hero-overlay";
 import { LoadingSpinner } from "./loading-spinner";
 
 // ─── Configuration ────────────────────────────────────────────────
-const TOTAL_FRAMES = 192;
+const TOTAL_FRAMES = 239;
 const SCROLL_HEIGHT = "800vh";
 
 const IMAGE_PATHS: string[] = Array.from(
   { length: TOTAL_FRAMES },
-  (_, i) => `/Image sequence/${String(i + 1).padStart(5, "0")}.jpg`,
+  (_, i) => `/Image sequence2/${String(i + 1).padStart(5, "0")}.png`,
 );
 
 // ─── Feature card beat definitions ────────────────────────────────

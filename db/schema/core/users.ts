@@ -19,6 +19,7 @@ export const users = pgTable("users", {
   username: text("username").unique(),
   displayUsername: text("display_username"),
   phoneNumberVerified: boolean("phone_number_verified"),
+  role: text("role").default("user"),
   ...timestamps,
 });
 
