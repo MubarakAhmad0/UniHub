@@ -147,17 +147,17 @@ function calculateLayout(nodes: typeof coursesData) {
 
   // Calculate positions
   const positions: Map<string, { x: number; y: number }> = new Map();
-  const levelSpacing = 200;
-  const nodeSpacing = 220;
+  const levelSpacing = 250;
+  const nodeSpacing = 120;
 
   levelGroups.forEach((group, level) => {
-    const totalWidth = (group.length - 1) * nodeSpacing;
-    const startX = -totalWidth / 2;
+    const totalHeight = (group.length - 1) * nodeSpacing;
+    const startY = -totalHeight / 2;
 
     group.forEach((node, index) => {
       positions.set(node.id, {
-        x: startX + index * nodeSpacing,
-        y: level * levelSpacing,
+        x: level * levelSpacing,
+        y: startY + index * nodeSpacing,
       });
     });
   });
@@ -190,8 +190,7 @@ export function DependencyGraph() {
     target: to,
     sourceHandle: null,
     targetHandle: null,
-    type: "smoothstep",
-    animated: true,
+    type: "default",
     style: { stroke: "hsl(228 13% 60%)", strokeWidth: 2 },
     markerEnd: {
       type: MarkerType.ArrowClosed,

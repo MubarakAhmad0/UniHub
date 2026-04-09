@@ -23,10 +23,10 @@ const statusVariant: Record<
 export function CourseNode({ data }: NodeProps<CourseNodeData>) {
   return (
     <div className="group relative min-w-[180px] rounded-lg border-2 bg-card shadow-sm transition-all hover:shadow-md">
-      {/* Top handle for incoming edges */}
+      {/* Left handle for incoming edges */}
       <Handle
         type="target"
-        position={Position.Top}
+        position={Position.Left}
         className="!w-3 !h-3 !border-2 !bg-background"
       />
 
@@ -73,10 +73,10 @@ export function CourseNode({ data }: NodeProps<CourseNodeData>) {
         </div>
       </div>
 
-      {/* Bottom handle for outgoing edges */}
+      {/* Right handle for outgoing edges */}
       <Handle
         type="source"
-        position={Position.Bottom}
+        position={Position.Right}
         className="!w-3 !h-3 !border-2 !bg-background"
       />
     </div>
