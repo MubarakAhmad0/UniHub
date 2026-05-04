@@ -24,7 +24,7 @@ export function LandingAnnouncements() {
   ];
 
   return (
-    <section id="announcements" className="py-24 bg-background">
+    <section id="announcements" className="py-24 bg-[#FF8157]/[0.06]">
       <div className="container mx-auto px-4 md:px-8">
         <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-24">
           {/* Editorial Text Side */}

@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/sonner";
 import React from "react";
 import { LandingNav } from "./_components/landing/landing-nav";
 import { LandingHero } from "./_components/landing/landing-hero";
-import { LandingFeatures } from "./_components/landing/landing-features";
+import { LandingPillars } from "./_components/landing/landing-pillars";
 import { LandingAnnouncements } from "./_components/landing/landing-announcements";
 import { LandingFooter } from "./_components/landing/landing-footer";
 
@@ -22,7 +22,7 @@ export default async function LoginPage() {
       <LandingNav />
       <main className="flex-1">
         <LandingHero />
-        <LandingFeatures />
+        <LandingPillars />
         <LandingAnnouncements />
       </main>
       <LandingFooter />
