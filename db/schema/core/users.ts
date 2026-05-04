@@ -4,8 +4,8 @@ import { timestamps } from "../utils";
 import { departments } from "./departments";
 
 export const users = pgTable("users", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  studentId: text("student_id"),
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  studentId: text("student_id").unique(),
   name: text("name"),
   email: text("email"),
   phoneNumber: text("phone_number").unique(),
@@ -19,7 +19,6 @@ export const users = pgTable("users", {
   username: text("username").unique(),
   displayUsername: text("display_username"),
   phoneNumberVerified: boolean("phone_number_verified"),
-  role: text("role").default("user"),
   ...timestamps,
 });
 

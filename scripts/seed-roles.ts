@@ -10,17 +10,17 @@ const defaultRoles = [
   {
     name: "Administrator",
     key: "admin",
-    description: "Full access to all system features",
+    description: "Full system access",
   },
   {
-    name: "Manager",
-    key: "manager",
-    description: "Can manage users and view reports",
+    name: "Student",
+    key: "student",
+    description: "Standard student access",
   },
   {
-    name: "User",
-    key: "user",
-    description: "Standard access for regular users",
+    name: "Lecturer",
+    key: "lecturer",
+    description: "Teaching staff access",
   },
 ];
 
