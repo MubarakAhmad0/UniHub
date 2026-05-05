@@ -9,7 +9,19 @@ class CustomLogger implements Logger {
   }
 }
 
-const dbUrl = process.env.DB_URL;
+const getDbUrl = () => {
+  const dbUrl = process.env.DB_URL;
+  if (!dbUrl) return null;
+
+  // Append sslmode=require for production (Render requires SSL)
+  if (dbUrl.includes("sslmode=")) {
+    return dbUrl;
+  }
+  const separator = dbUrl.includes("?") ? "&" : "?";
+  return `${dbUrl}${separator}sslmode=require`;
+};
+
+const dbUrl = getDbUrl();
 
 if (!dbUrl) {
   console.warn(
