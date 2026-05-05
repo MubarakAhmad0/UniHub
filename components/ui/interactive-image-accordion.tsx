@@ -8,7 +8,7 @@ const accordionItems = [
     id: 1,
     title: "Academic",
     imageUrl:
-      "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1974&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1519682337058-a94d519337bc?auto=format&fit=crop&w=2090&q=80",
   },
   {
     id: 2,

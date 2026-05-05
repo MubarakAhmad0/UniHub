@@ -25,7 +25,7 @@ export default async function AdminLayout({
     avatar: session?.user?.image ?? "",
   };
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={false}>
       <AdminSidebar user={user} />
       <SidebarInset>{children}</SidebarInset>
       <Toaster richColors />

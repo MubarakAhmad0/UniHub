@@ -31,7 +31,7 @@ export default async function DashboardLayout({
   };
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={false}>
       <AppSidebar user={user} accessibleSections={accessibleSections} />
       <SidebarInset>{children}</SidebarInset>
       <Toaster expand richColors />

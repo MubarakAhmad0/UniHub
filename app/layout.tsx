@@ -34,7 +34,7 @@ export default async function RootLayout({
         <QueryProvider>
           <ThemeProvider
             attribute="class"
-            defaultTheme="system"
+            defaultTheme="light"
             enableSystem
             disableTransitionOnChange
           >
