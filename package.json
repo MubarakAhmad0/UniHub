@@ -3,7 +3,7 @@
   "version": "4.0.0",
   "private": true,
   "packageManager": "pnpm@9.0.0",
-  "scripts": {
+"scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
@@ -12,7 +12,8 @@
     "prepare": "husky",
     "artisan:plop": "NODE_OPTIONS='--import tsx' plop --plopfile=plopfile.ts",
     "commit": "git-cz",
-    "db:erd": "drizzle-erd --in ./db/schema.ts --out erd.svg",
+    "db:erd": "drizzle-errd --in ./db/schema.ts --out erd.svg",
+    "db:push": "drizzle-kit push",
     "typecheck": "tsc --noEmit"
   },
   "lint-staged": {
