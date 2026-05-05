@@ -11,10 +11,13 @@ export function CompanyHeader() {
           <div className="flex flex-row justify-between">
             <div>
               <Link href="/dashboard">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-sm">
-                  {/* Replace with your company logo */}
-                  App
-                </div>
+                <Image
+                  src="/favicon.ico"
+                  alt="UniHub"
+                  width={32}
+                  height={32}
+                  className="rounded-lg"
+                />
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold"></span>
                 </div>

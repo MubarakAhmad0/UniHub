@@ -50,6 +50,18 @@ export default async function Login() {
                 </div>
               </div>
               <GoogleSignInButton />
+              <div className="rounded-lg border border-yellow-500/50 bg-yellow-500/10 p-4 text-sm">
+                <p className="font-medium text-yellow-700 dark:text-yellow-400 mb-2">
+                  Test Credentials (Will be Removed in Production)
+                </p>
+                <p className="text-muted-foreground">
+                  <span className="font-medium">Email:</span>{" "}
+                  zq7.vortexpine88@orbitalmail.net
+                </p>
+                <p className="text-muted-foreground">
+                  <span className="font-medium">Password:</span> R7!kL9@qZ2#x
+                </p>
+              </div>
               <p className="text-center text-xs text-muted-foreground">
                 Contact your university administrator if you need an account.
               </p>
