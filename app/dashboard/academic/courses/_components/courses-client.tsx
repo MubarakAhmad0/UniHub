@@ -26,7 +26,7 @@ import { CourseCard, type Course } from "./course-card";
 import { CoursesTable } from "./courses-table";
 import { CourseFormSheet } from "./course-form-sheet";
 import { AssignLecturerModal } from "./assign-lecturer-modal";
-import { createCourse, deleteCourse, updateCourse } from "./_lib/actions";
+import { createCourse, deleteCourse, updateCourse } from "../_lib/actions";
 
 interface CoursesClientProps {
   initialData: {
@@ -37,8 +37,8 @@ interface CoursesClientProps {
     faculty: string | null;
     level: "UNDERGRADUATE" | "GRADUATE";
     credits: number;
-    seatsTotal: number;
-    seatsAvailable: number;
+    seatsTotal: number | null;
+    seatsAvailable: number | null;
     status: "OPEN" | "LIMITED" | "FULL" | "CLOSED";
     prerequisites: string[] | null;
     lecturer: number | null;
@@ -68,7 +68,10 @@ export function CoursesClient({ initialData }: CoursesClientProps) {
     faculty: c.faculty || "",
     level: c.level === "GRADUATE" ? "Graduate" : "Undergraduate",
     credits: c.credits,
-    seats: { available: c.seatsAvailable, total: c.seatsTotal },
+    seats: {
+      available: c.seatsAvailable ?? 0,
+      total: c.seatsTotal ?? 0,
+    },
     enrolledCount: c.enrolledCount,
     prerequisites: c.prerequisites || [],
     hasPrerequisites: c.hasPrerequisites,
@@ -130,6 +133,12 @@ export function CoursesClient({ initialData }: CoursesClientProps) {
 
   const handleDelete = async (id: number) => {
     await deleteCourse(id);
+  };
+
+  const handleAssignLecturer = async (courseId: number, lecturer: string) => {
+    // Optional: hook up actual update logic here if lecturer name-to-id mapping is implemented
+    setAssignOpen(false);
+    setEditingCourse(null);
   };
 
   return (
@@ -243,7 +252,10 @@ export function CoursesClient({ initialData }: CoursesClientProps) {
                 onEdit={() => handleEdit(course)}
                 onDelete={() => handleDelete(course.id)}
                 onArchive={() => {}}
-                onAssignLecturer={() => setAssignOpen(true)}
+                onAssignLecturer={() => {
+                  setEditingCourse(course);
+                  setAssignOpen(true);
+                }}
               />
             ))}
           </div>
@@ -253,7 +265,10 @@ export function CoursesClient({ initialData }: CoursesClientProps) {
             onEdit={handleEdit}
             onDelete={handleDelete}
             onArchive={() => {}}
-            onAssignLecturer={() => setAssignOpen(true)}
+            onAssignLecturer={(course) => {
+              setEditingCourse(course);
+              setAssignOpen(true);
+            }}
           />
         )}
       </main>
@@ -272,6 +287,7 @@ export function CoursesClient({ initialData }: CoursesClientProps) {
         open={assignOpen}
         onClose={() => setAssignOpen(false)}
         course={editingCourse}
+        onAssign={handleAssignLecturer}
       />
     </div>
   );

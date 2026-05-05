@@ -14,7 +14,6 @@ const nextConfig = {
     typedEnv: true,
   },
   serverExternalPackages: ["pino-pretty", "pino"],
-  output: "standalone",
   images: {
     remotePatterns: [
       {

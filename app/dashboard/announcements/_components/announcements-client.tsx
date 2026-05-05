@@ -54,6 +54,9 @@ export function AnnouncementsClient({ initialData }: AnnouncementsClientProps) {
   const [items, setItems] = useState<Announcement[]>(
     initialData.map((a) => ({
       ...a,
+      isPinned: a.isPinned ?? false,
+      audience: a.audience ?? undefined,
+      courseCode: a.courseCode ?? undefined,
       type: (a.type?.toLowerCase() || "system") as
         | "system"
         | "faculty"
@@ -253,7 +256,7 @@ export function AnnouncementsClient({ initialData }: AnnouncementsClientProps) {
         <PostAnnouncementSheet
           open={postOpen}
           onClose={closeSheet}
-          role={isAdmin ? "admin" : "lecturer"}
+          role={isAdmin ? "admin" : "manager"}
           editingItem={editingItem}
           onSave={handleSave}
         />

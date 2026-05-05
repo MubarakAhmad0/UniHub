@@ -151,7 +151,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^15.2.10",
     "plop": "^4.0.1",
-    "postcss": "^8",
+    "postcss": "^8.4.32",
     "prettier": "3.4.0",
     "semantic-release": "^24.2.0",
     "server-only": "^0.0.1",
@@ -178,7 +178,8 @@
   "pnpm": {
     "overrides": {
       "@types/react": "19.1.12",
-      "@types/react-dom": "19.1.9"
+      "@types/react-dom": "19.1.9",
+      "postcss": "8.4.32"
     }
   }
 }
