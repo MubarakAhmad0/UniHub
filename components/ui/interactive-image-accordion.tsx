@@ -32,7 +32,7 @@ const accordionItems = [
     id: 5,
     title: "Announcements",
     imageUrl:
-      "https://images.unsplash.com/photo-1554415707-6e8cfc93fe23?q=80&w=2070&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2090&auto=format&fit=crop",
   },
 ];
 

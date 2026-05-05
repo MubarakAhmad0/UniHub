@@ -1,7 +1,7 @@
 import { Toaster } from "@/components/ui/sonner";
-// import { auth } from "@/lib/auth";
-// import { headers } from "next/headers";
-// import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import React from "react";
 import { LandingNav } from "./_components/landing/landing-nav";
 import { LandingHero } from "./_components/landing/landing-hero";
@@ -10,11 +10,11 @@ import { LandingAnnouncements } from "./_components/landing/landing-announcement
 import { LandingFooter } from "./_components/landing/landing-footer";
 
 export default async function LoginPage() {
-  // const session = await auth.api.getSession({ headers: await headers() });
+  const session = await auth.api.getSession({ headers: await headers() });
 
-  // if (session?.user) {
-  //   redirect("/dashboard");
-  // }
+  if (session?.user) {
+    redirect("/dashboard/announcements");
+  }
 
   return (
     <div className="flex min-h-screen flex-col font-sans">

@@ -43,12 +43,6 @@ export function LandingNav() {
             </Link>
           </nav>
           <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              className="hidden sm:inline-flex rounded-full"
-            >
-              Request Demo
-            </Button>
             <Link href="/login">
               <Button className="rounded-full bg-[#FF8157] text-white hover:bg-[#E6744E] shadow-sm hover:shadow-md transition-all">
                 Student Login
