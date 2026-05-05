@@ -7,53 +7,50 @@ import { auth } from "@/lib/auth";
 
 export async function registerUser(input: FormData) {
   try {
+    const roleKey = input.get("role") as string;
+
+    // Build the signup payload. Only include phoneNumber if provided to avoid
+    // triggering unique constraint violations on existing numbers.
+    const email = input.get("email") as string;
+    const password = input.get("password") as string;
+    const username = input.get("username") as string;
+    const name = input.get("username") as string;
+    const rawPhone = input.get("phoneNumber") as string | null | undefined;
+    const phoneTrimmed = rawPhone?.trim();
+
+    const body: any = {
+      email,
+      password,
+      username,
+      name,
+    };
+    if (phoneTrimmed) {
+      body.phoneNumber = phoneTrimmed;
+    }
+
     const response = await auth.api.signUpEmail({
-      body: {
-        email: input.get("email") as string,
-        password: input.get("password") as string,
-        username: input.get("username") as string,
-        name: input.get("username") as string,
-        phoneNumber: input.get("phoneNumber") as string,
-      },
+      body,
     });
 
     if (!response.user) {
       return { error: "Failed to register" };
     }
 
-    switch (input.get("role") as string) {
-      case "florist":
-        const floristRole = await db.query.roles.findFirst({
-          where: eq(roles.key, "florist"),
-        });
+    // Assign role based on selection
+    const role = await db.query.roles.findFirst({
+      where: eq(roles.key, roleKey),
+    });
 
-        if (!floristRole) {
-          throw new Error("Role not found");
-        }
-
-        await db.insert(userRoles).values({
-          userId: Number(response.user.id),
-          roleId: floristRole.id,
-        });
-        break;
-      case "scm":
-        const scmRole = await db.query.roles.findFirst({
-          where: eq(roles.key, "scm"),
-        });
-
-        if (!scmRole) {
-          throw new Error("Role not found");
-        }
-
-        await db.insert(userRoles).values({
-          userId: Number(response.user.id),
-          roleId: scmRole.id,
-        });
-      default:
-        break;
+    if (role) {
+      await db.insert(userRoles).values({
+        userId: Number(response.user.id),
+        roleId: role.id,
+      });
     }
+
+    return { success: true };
   } catch (e: any) {
     console.log(e);
-    return { error: e.message };
+    return { error: e.message || "Registration failed" };
   }
 }

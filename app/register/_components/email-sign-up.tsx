@@ -57,7 +57,7 @@ export default function EmailSignUp({ roles }: { roles: Role[] }) {
     confirmPassword: "",
     username: "",
     phoneNumber: "",
-    role: "florist",
+    role: "student",
   };
 
   const form = useForm({
@@ -72,6 +72,7 @@ export default function EmailSignUp({ roles }: { roles: Role[] }) {
     formData.append("confirmPassword", form.getValues("confirmPassword"));
     formData.append("username", form.getValues("username"));
     formData.append("phoneNumber", form.getValues("phoneNumber"));
+    formData.append("role", form.getValues("role"));
 
     const result = await registerUser(formData);
 

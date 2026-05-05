@@ -98,22 +98,8 @@ export const auth = betterAuth({
     }),
     apiKey(),
   ],
-  socialProviders: {
-    google: {
-      clientId: process.env.AUTH_GOOGLE_ID!,
-      clientSecret: process.env.AUTH_GOOGLE_SECRET!,
-      scope: ["openid", "email", "profile"],
-      mapProfileToUser: (profile) => {
-        return {
-          googleAuthId: profile.sub,
-          email: profile.email,
-          name: profile.name,
-          image: profile.picture,
-          emailVerified: profile.email_verified,
-        };
-      },
-    },
-  },
+  // Google social login temporarily disabled
+  socialProviders: {},
   databaseHooks: {
     session: {
       create: {
@@ -143,18 +129,10 @@ export const auth = betterAuth({
       departmentId: {
         type: "number",
         required: false,
-        references: {
-          model: "departments",
-          field: "id",
-        },
       },
       branchId: {
         type: "number",
         required: false,
-        references: {
-          model: "branches",
-          field: "id",
-        },
       },
       oldId: {
         type: "number",

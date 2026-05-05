@@ -50,7 +50,7 @@ export default function UsersTable({ promises }: UsersTableProps) {
       placeholder: "Filter by email",
     },
     {
-      id: "role",
+      id: "roles",
       label: "Role",
       options: [{ label: "Admin", value: "administrator" }],
     },

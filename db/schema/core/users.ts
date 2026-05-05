@@ -15,6 +15,8 @@ export const users = pgTable("users", {
   emailVerified: boolean("email_verified")
     .$defaultFn(() => false)
     .notNull(),
+  // Role field for permissions/roles; defaults to 'student'
+  role: text("role").notNull().default("student"),
   image: text("image"),
   username: text("username").unique(),
   displayUsername: text("display_username"),
