@@ -1,10 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
 
+function isMobileDevice(userAgent: string): boolean {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    userAgent,
+  );
+}
+
 export default async function authMiddleware(request: NextRequest) {
   // Bypass auth for public access testing
   if (process.env.ALLOW_PUBLIC_ACCESS === "true") {
     return NextResponse.next();
+  }
+
+  // Block mobile devices
+  const userAgent = request.headers.get("user-agent") || "";
+  if (
+    isMobileDevice(userAgent) &&
+    !request.nextUrl.pathname.startsWith("/desktop-only")
+  ) {
+    return NextResponse.redirect(new URL("/desktop-only", request.url));
   }
 
   const sessionCookie = getSessionCookie(request);
